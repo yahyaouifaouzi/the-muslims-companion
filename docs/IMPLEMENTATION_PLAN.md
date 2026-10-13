@@ -1,7 +1,7 @@
 # Implementation Plan — رفيق المسلم (The Muslim's Companion)
 
-Status: **Re-inspected during Prompt 00 (2026-10-13); updated after Prompt 08.**
-Milestones 01–08 are implemented; checks are green. Next up: Prompt 09.
+Status: **Re-inspected during Prompt 00 (2026-10-13); updated after Prompt 09.**
+Milestones 01–09 are implemented; checks are green. Next up: Prompt 10.
 
 ## 1. Current environment
 
@@ -38,14 +38,15 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 - `docs/CONTENT_SCHEMA.md` — JSON contract (schemaVersion vs contentVersion,
   placeholder policy).
 - `docs/CONTENT_PUBLISHING.md` — how to host and publish a content release.
-- `test/` — 11 files, **102 tests, all passing**: model parsing/validation,
+- `test/` — 12 files, **112 tests, all passing**: model parsing/validation,
   repository fixtures (valid/missing/duplicate/malformed), shell/RTL/empty/
   error widget tests, reader font-bound/share-text tests, Arabic search
   normalization/matching, favorites persistence + stale-ID resolution,
   counter increment/reset/persistence/completion, content cache atomicity,
   remote client security constraints, refresh service (unchanged/success/
   timeout/invalid-JSON/duplicate-IDs/bad-category-ref/partial-download/
-  rollback), and real-asset smoke test.
+  rollback), reminder settings persistence + daily next-occurrence/time
+parsing, and real-asset smoke test.
 - `README.md` — setup, run, and check commands.
 - `AGENTS.md` / `GEMINI.md` / `.claude/` / `opencode.json` — agent tooling
   (graft context graph) added by the `MCP` commit; `graft/` is local-only
@@ -63,7 +64,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 | 06 | Search + Arabic normalization + persistent favorites | ✅ Done (`search_screen.dart`, `favorites_store.dart`; shared `EntryCard`) |
 | 07 | Adhkar repetition counter | ✅ Done (`counter_store.dart`, `counter_section.dart`; large tap target) |
 | 08 | Hybrid remote JSON updates + offline cache/rollback | ✅ Done (`content/refresh/`: cache, client, service; Settings refresh UI) |
-| 09 | Daily local notifications + settings | ⬜ Not started (no `flutter_local_notifications` dep) |
+| 09 | Daily local notifications + settings | ✅ Done (`reminder_store.dart`, `notification_service.dart`, Settings reminder section; inexact-only scheduling) |
 | 10 | Accessibility & polish pass | ⬜ Not started |
 | 11 | Release readiness (identity, signing, checklist) | ⬜ Not started |
 
@@ -71,7 +72,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 
 - `flutter doctor` → No issues found ✓
 - `flutter analyze` → No issues found (exit 0) ✓
-- `flutter test` → 102/102 passed (exit 0) ✓
+- `flutter test` → 112/112 passed (exit 0) ✓
 
 ### Known gaps / housekeeping
 
@@ -108,9 +109,20 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 
 ## 4. Immediate next action
 
-Send **Prompt 09** (daily local notifications + settings) from
-`CLAUDE_CODE_PROMPTS.md`. New deps likely needed:
-`flutter_local_notifications`, `timezone`. Starting points: the Settings
-screen (content section exists; add reminder section), `CounterStore`/
-`FavoritesStore` patterns for persistence. Preserve the green working tree
-and the 102 passing tests.
+Send **Prompt 10** (accessibility & polish pass) from `CLAUDE_CODE_PROMPTS.md`.
+Preserve the green working tree and the 112 passing tests.
+
+### Prompt 09 notes (carried forward)
+
+- Reminder is opt-in and explicitly labelled as a convenience, not a
+  religious obligation (Arabic UI copy enforces this).
+- Scheduling is **inexact only** (`AndroidScheduleMode.inexact`) — no
+  `SCHEDULE_EXACT_ALARM` permission; single notification ID so rescheduling
+  replaces. Runtime permission requested on toggle (Android 13+), denial is
+  reported in the Settings UI and the reminder stays off.
+- Android manifest now declares `POST_NOTIFICATIONS` + `RECEIVE_BOOT_COMPLETED`
+  (plugin boot receiver re-arms reminders after reboot).
+- Notification tap uses the default launcher activity (no deep link), so no
+  deep-link target validation was needed.
+- **Device delivery not tested** — verified only via unit/widget tests
+  (`flutter test`); on-device scheduling requires a manual Android run.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/notification_service.dart';
 import '../widgets/app_bottom_nav.dart';
 import 'favorites_screen.dart';
 import 'home_screen.dart';
@@ -8,7 +9,10 @@ import 'settings_screen.dart';
 /// Shell for the three root screens (home, favorites, settings) driven by a
 /// bottom NavigationBar; [IndexedStack] keeps state across tab switches.
 class MainShell extends StatefulWidget {
-  const MainShell({super.key});
+  const MainShell({super.key, this.notificationService});
+
+  /// Injectable for tests; provided by the app root in production.
+  final NotificationService? notificationService;
 
   @override
   State<MainShell> createState() => _MainShellState();
@@ -22,7 +26,11 @@ class _MainShellState extends State<MainShell> {
     return Scaffold(
       body: IndexedStack(
         index: _index,
-        children: const [HomeScreen(), FavoritesScreen(), SettingsScreen()],
+        children: [
+          const HomeScreen(),
+          const FavoritesScreen(),
+          SettingsScreen(notificationService: widget.notificationService),
+        ],
       ),
       bottomNavigationBar: AppBottomNav(
         index: _index,

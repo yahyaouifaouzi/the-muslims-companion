@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'app/content_provider.dart';
 import 'app/counter_store.dart';
 import 'app/favorites_store.dart';
+import 'app/notification_service.dart';
+import 'app/reminder_store.dart';
 import 'app/theme/app_theme.dart';
 import 'content/local_content_repository.dart';
 import 'content/refresh/content_cache.dart';
@@ -28,7 +30,15 @@ void main() async {
           client: RemoteContentClient(baseUrl: kContentBaseUrl),
           cache: cache,
         );
-  runApp(MuslimCompanionApp(cache: cache, refreshService: refreshService));
+  final notificationService = NotificationService();
+  await notificationService.init();
+  runApp(
+    MuslimCompanionApp(
+      cache: cache,
+      refreshService: refreshService,
+      notificationService: notificationService,
+    ),
+  );
 }
 
 Future<ContentCache?> _createCache() async {
@@ -57,6 +67,7 @@ class MuslimCompanionApp extends StatelessWidget {
     this.counterStore,
     this.cache,
     this.refreshService,
+    this.notificationService,
   });
 
   /// Injectable for tests; the real repository reads bundled assets.
@@ -73,6 +84,9 @@ class MuslimCompanionApp extends StatelessWidget {
 
   /// Injectable for tests; the real service uses a network client.
   final ContentRefreshService? refreshService;
+
+  /// Injectable for tests; the real service wraps flutter_local_notifications.
+  final NotificationService? notificationService;
 
   static const String appTitle = 'رفيق المسلم';
 
@@ -93,6 +107,7 @@ class MuslimCompanionApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => (counterStore ?? CounterStore())..load(),
         ),
+        ChangeNotifierProvider(create: (_) => ReminderStore()..load()),
       ],
       child: MaterialApp(
         title: appTitle,
@@ -105,7 +120,7 @@ class MuslimCompanionApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
         ],
         locale: const Locale('ar'),
-        home: const MainShell(),
+        home: MainShell(notificationService: notificationService),
       ),
     );
   }
