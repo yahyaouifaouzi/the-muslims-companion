@@ -58,8 +58,12 @@ class CategoryCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Icon(
-                Icons.chevron_right,
-                textDirection: TextDirection.rtl,
+                // Forward chevron points the way reading progresses: left in
+                // RTL, right in LTR. (Icon's textDirection does not mirror
+                // the glyph, so the direction must pick the icon.)
+                Directionality.of(context) == TextDirection.rtl
+                    ? Icons.chevron_left
+                    : Icons.chevron_right,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ],
