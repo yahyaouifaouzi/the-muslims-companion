@@ -3,12 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:the_muslims_companion/main.dart';
 
 void main() {
-  testWidgets('App shell renders the Arabic title and placeholder body', (
+  testWidgets('Real bundled content renders on the home screen', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const MuslimCompanionApp());
+    await tester.pumpAndSettle();
 
     expect(find.text('رفيق المسلم'), findsOneWidget);
-    expect(find.text('المزيد قادم قريباً'), findsOneWidget);
+    expect(find.text('أذكار الصباح'), findsOneWidget);
+    expect(find.text('ابحث في المحتوى'), findsOneWidget);
   });
 }
