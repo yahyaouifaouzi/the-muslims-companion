@@ -94,3 +94,25 @@ class EmptyView extends StatelessWidget {
     );
   }
 }
+
+/// "غير موثّق" chip marking placeholder/unverified content, so every screen
+/// labels it the same way.
+class PlaceholderBadge extends StatelessWidget {
+  const PlaceholderBadge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsetsDirectional.symmetric(
+        horizontal: 8,
+        vertical: 3,
+      ),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.secondary.withValues(alpha: 0.25),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text('غير موثّق', style: theme.textTheme.labelSmall),
+    );
+  }
+}

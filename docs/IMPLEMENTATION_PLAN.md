@@ -1,7 +1,7 @@
 # Implementation Plan — رفيق المسلم (The Muslim's Companion)
 
-Status: **Re-inspected during Prompt 00 (2026-10-13).** Milestones 01–04 are
-implemented and committed (`01`…`04`); checks are green. Next up: Prompt 05.
+Status: **Re-inspected during Prompt 00 (2026-10-13); updated after Prompt 05.**
+Milestones 01–05 are implemented; checks are green. Next up: Prompt 06.
 
 ## 1. Current environment
 
@@ -31,9 +31,10 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
   registered in `pubspec.yaml`.
 - `docs/CONTENT_SCHEMA.md` — JSON contract (schemaVersion vs contentVersion,
   placeholder policy).
-- `test/` — 4 files, **38 tests, all passing**: model parsing/validation,
+- `test/` — 4 files, **46 tests, all passing**: model parsing/validation,
   repository fixtures (valid/missing/duplicate/malformed), shell/RTL/empty/
-  error widget tests, real-asset smoke test.
+  error widget tests, reader font-bound/share-text tests, real-asset smoke
+  test.
 - `README.md` — setup, run, and check commands.
 - `AGENTS.md` / `GEMINI.md` / `.claude/` / `opencode.json` — agent tooling
   (graft context graph) added by the `MCP` commit; `graft/` is local-only
@@ -47,7 +48,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 | 02 | Content models + bundled JSON + schema doc + tests | ✅ Done (commit `02`) |
 | 03 | Local content repository (allow-list, typed errors, tests) | ✅ Done (commit `03`) |
 | 04 | App shell, home/categories/detail, states, widget tests | ✅ Done (commit `04`) |
-| 05 | Reader screen: font size, copy/share, verbatim Arabic | ⬜ Not started |
+| 05 | Reader screen: font size, copy/share, verbatim Arabic | ✅ Done (new `lib/ui/screens/reader_screen.dart`) |
 | 06 | Search + Arabic normalization + persistent favorites | ⬜ Not started (search is an entry-point stub; Favorites tab shows empty state) |
 | 07 | Adhkar repetition counter | ⬜ Not started |
 | 08 | Hybrid remote JSON updates + offline cache/rollback | ⬜ Not started (repo is local-only; `http`/`path_provider` not yet deps) |
@@ -59,7 +60,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 
 - `flutter doctor` → No issues found ✓
 - `flutter analyze` → No issues found (exit 0) ✓
-- `flutter test` → 38/38 passed (exit 0) ✓
+- `flutter test` → 46/46 passed (exit 0) ✓
 
 ### Known gaps / housekeeping
 
@@ -68,8 +69,8 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
   (Prompt 11 scope).
 - `pubspec.yaml` description still says "Milestone 1 (foundation)" — stale
   wording, cosmetic.
-- `shared_preferences` and `share_plus` are installed but unused in `lib/`
-  yet — reserved for Prompts 05/06.
+- `shared_preferences` is installed but unused in `lib/` yet — reserved for
+  Prompt 06 (favorites persistence); `share_plus` is now used by the reader.
 - `docs/IMPLEMENTATION_PLAN.md` milestones 08/09 mention docs
   (`CONTENT_PUBLISHING.md`, `RELEASE_CHECKLIST.md`) that don't exist yet.
 
@@ -92,7 +93,8 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 
 ## 4. Immediate next action
 
-Send **Prompt 05** (reader screen, text settings, copy/share) from
-`CLAUDE_CODE_PROMPTS.md`. Existing `share_plus` dep and the reader-less
-`category_detail_screen.dart` are the starting points. Preserve the green
-working tree and the 38 passing tests.
+Send **Prompt 06** (search, Arabic normalization, persistent favorites) from
+`CLAUDE_CODE_PROMPTS.md`. Starting points: the search stub snackbar in
+`home_screen.dart`, the empty `favorites_screen.dart`, and the unused
+`shared_preferences` dependency. Preserve the green working tree and the 46
+passing tests.

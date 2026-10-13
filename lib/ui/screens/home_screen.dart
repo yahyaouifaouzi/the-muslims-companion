@@ -8,6 +8,7 @@ import '../widgets/featured_section.dart';
 import '../widgets/state_views.dart';
 import 'categories_screen.dart';
 import 'category_detail_screen.dart';
+import 'reader_screen.dart';
 
 /// Home: app title, greeting, search entry point, featured content (only if
 /// valid content exists), and category cards rendered from the loaded catalog.
@@ -69,7 +70,8 @@ class _HomeBody extends StatelessWidget {
         const SizedBox(height: 24),
         FeaturedSection(
           entries: catalog.allEntries,
-          onEntryTap: (entry) => _openEntryCategory(context, entry.categoryId),
+          onEntryTap: (entry) =>
+              Navigator.of(context).push(ReaderScreen.route(entry: entry)),
         ),
         const SizedBox(height: 24),
         Row(
@@ -99,17 +101,6 @@ class _HomeBody extends StatelessWidget {
             ),
       ],
     );
-  }
-
-  void _openEntryCategory(BuildContext context, String categoryId) {
-    final provider = context.read<ContentProvider>();
-    final categories = provider.catalog?.categories
-        .where((category) => category.id == categoryId)
-        .toList();
-    if (categories != null && categories.isNotEmpty) {
-      Navigator.of(context)
-          .push(CategoryDetailScreen.route(category: categories.first));
-    }
   }
 }
 
