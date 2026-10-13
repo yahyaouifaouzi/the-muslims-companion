@@ -63,6 +63,9 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
 
+  # Windows MSIX packaging (run `dart run msix:create` on Windows/CI).
+  msix: ^3.16.16
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -105,9 +108,20 @@ flutter:
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
+  #       - asset: fonts/TrajanPro-Regular.ttf
+  #       - asset: fonts/TrajanPro-Bold.ttf
   #         weight: 700
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Windows MSIX packaging config (used by the `msix` dev dependency).
+# Run `dart run msix:create` on Windows or in CI after `flutter build windows`.
+msix:
+  display_name: Rafiq
+  publisher_display_name: ideas2d
+  identity: com.ideas2d.themuslimscompanion
+  publisher: CN=ideas2d
+  logo: android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+  languages: ar-sa
+  # capabilities: internetClient  # not needed — app is fully offline
