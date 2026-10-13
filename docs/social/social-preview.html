@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>رفيق المسلم — social preview</title>
+<!--
+  GitHub social preview for TheMuslimsCompanion.
+  Canvas is exactly 1280 x 640 px. Every element sits >= 80 px from the edges
+  (GitHub crops previews in some views).
+
+  Colours are taken from lib/app/theme/app_theme.dart:
+    greenPrimary #2E6B34 · greenDark #1E4A24 · beigeAccent #CBB98A · offWhite #FBF9F4
+
+  Render to PNG with headless Chromium from the repo root (so the bundled
+  Noto Naskh Arabic font and the app icon resolve over http):
+    python3 -m http.server 8123 &
+    google-chrome --headless --disable-gpu --no-sandbox --hide-scrollbars \
+      --allow-file-access-from-files --force-device-scale-factor=1 \
+      --virtual-time-budget=10000 \
+      --screenshot=docs/social/social-preview.png --window-size=1280,640 \
+      http://localhost:8123/docs/social/social-preview.html
+-->
+<style>
+  @font-face {
+    font-family: 'NotoNaskhArabic';
+    src: url('../../assets/fonts/NotoNaskhArabic-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+  }
+  @font-face {
+    font-family: 'NotoNaskhArabic';
+    src: url('../../assets/fonts/NotoNaskhArabic-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: block;
+  }
+
+  :root {
+    --green: #2E6B34;
+    --green-dark: #1E4A24;
+    --beige: #CBB98A;
+    --off-white: #FBF9F4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 1280px;
+    height: 640px;
+    overflow: hidden;
+    background: var(--off-white);
+    font-family: 'NotoNaskhArabic', serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+
+  .canvas {
+    position: relative;
+    width: 1280px;
+    height: 640px;
+    background-color: var(--off-white);
+    /* Subtle flat diamond lattice — calm, geometric, no stock-photo look. */
+    background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'>\
+<path d='M28 6 L50 28 L28 50 L6 28 Z' fill='none' stroke='%23CBB98A' stroke-width='1.15' opacity='0.30'/>\
+<circle cx='28' cy='28' r='1.6' fill='%23CBB98A' opacity='0.30'/></svg>");
+    background-repeat: repeat;
+  }
+
+  /* ---- Left: phone mockup ------------------------------------------- */
+  .phone {
+    position: absolute;
+    left: 150px;
+    top: 92px;
+    width: 258px;
+    height: 456px;
+    background: var(--green);
+    border-radius: 38px;
+    padding: 11px;
+    /* Flat: a darker outline instead of a drop shadow. */
+    outline: 2px solid var(--green-dark);
+    outline-offset: -2px;
+  }
+  .phone-screen {
+    width: 100%;
+    height: 100%;
+    background: var(--off-white);
+    border-radius: 28px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .phone-header {
+    height: 74px;
+    background: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    flex-shrink: 0;
+  }
+  .app-icon-chip {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .app-icon-chip img { width: 30px; height: 30px; display: block; }
+  .header-bar {
+    height: 12px;
+    border-radius: 6px;
+    background: var(--beige);
+    opacity: 0.85;
+  }
+  .header-bar.w1 { flex: 1; }
+  .header-bar.w2 { width: 26px; flex: none; opacity: 0.45; }
+
+  .phone-body { flex: 1; padding: 12px 12px 4px; display: flex; flex-direction: column; gap: 10px; }
+
+  .card {
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    border-radius: 14px;
+    padding: 12px 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .card-title { height: 11px; border-radius: 5px; background: var(--beige); width: 62%; }
+  .card-line { height: 7px; border-radius: 4px; background: rgba(30, 74, 36, 0.16); }
+  .card-line.short { width: 78%; }
+  .card-line.tiny { width: 45%; }
+
+  .phone-nav {
+    height: 46px;
+    background: #FFFFFF;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-shrink: 0;
+  }
+  .nav-dot { width: 22px; height: 22px; border-radius: 7px; background: var(--beige); opacity: 0.55; }
+  .nav-dot.active { background: var(--green); opacity: 1; }
+
+  /* ---- Right: text block -------------------------------------------- */
+  .textblock {
+    position: absolute;
+    right: 80px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+  }
+  .accent {
+    width: 68px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--beige);
+    margin-bottom: 22px;
+  }
+  .title {
+    font-size: 100px;
+    font-weight: 700;
+    line-height: 1.12;
+    color: var(--green);
+    letter-spacing: 0;
+  }
+  .subtitle {
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--green-dark);
+    margin-top: 12px;
+    letter-spacing: 0.2px;
+  }
+  .tags {
+    display: flex;
+    gap: 12px;
+    margin-top: 26px;
+  }
+  .tag {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--green-dark);
+    background: var(--beige);
+    padding: 7px 20px;
+    border-radius: 999px;
+    line-height: 1.3;
+  }
+</style>
+</head>
+<body>
+  <div class="canvas">
+
+    <!-- Phone mockup (left). Placeholder shapes only — no real text. -->
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="phone-header">
+          <div class="app-icon-chip">
+            <img src="../../android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" alt="">
+          </div>
+          <div class="header-bar w1"></div>
+          <div class="header-bar w2"></div>
+        </div>
+        <div class="phone-body">
+          <div class="card">
+            <div class="card-title"></div>
+            <div class="card-line"></div>
+            <div class="card-line short"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"></div>
+            <div class="card-line"></div>
+            <div class="card-line tiny"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"></div>
+            <div class="card-line short"></div>
+            <div class="card-line"></div>
+          </div>
+        </div>
+        <div class="phone-nav">
+          <div class="nav-dot active"></div>
+          <div class="nav-dot"></div>
+          <div class="nav-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Text block (right, RTL). -->
+    <div class="textblock">
+      <div class="accent"></div>
+      <div class="title">رفيق المسلم</div>
+      <div class="subtitle">The Muslim&rsquo;s Companion</div>
+      <div class="tags">
+        <span class="tag">أدعية</span>
+        <span class="tag">أحاديث</span>
+        <span class="tag">أذكار</span>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
