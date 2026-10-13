@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
@@ -16,13 +17,26 @@ import 'reminder_store.dart';
 /// - **Daily repetition** via `DateTimeComponents.time` so the OS re-arms
 ///   the alarm each day.
 /// - **Tap opens the app** via the default launcher activity (no deep link).
+///
+/// Cross-platform: Android and Windows support `zonedSchedule`. Linux does
+/// not (the plugin only supports immediate `show`), so [supportsScheduling]
+/// is false there and the reminder UI is hidden.
 class NotificationService {
   static const int _reminderId = 0;
+  static const String _aumid = 'com.ideas2d.themuslimscompanion';
+  static const String _winGuid = '{8f3a5b1e-2c4d-4e6f-8a9b-0c1d2e3f4a5b}';
 
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
 
   bool _initialized = false;
+
+  /// True on platforms where the plugin supports scheduled (zoned) reminders.
+  ///
+  /// Android and Windows: yes. Linux: no (plugin lacks `zonedSchedule`).
+  bool get supportsScheduling =>
+      defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.windows;
 
   /// Initializes timezone handling and the notification plugin.
   ///
@@ -38,7 +52,19 @@ class NotificationService {
       const androidSettings = AndroidInitializationSettings(
         '@mipmap/ic_launcher',
       );
-      const settings = InitializationSettings(android: androidSettings);
+      const linuxSettings = LinuxInitializationSettings(
+        defaultActionName: 'Open',
+      );
+      const windowsSettings = WindowsInitializationSettings(
+        appName: 'Rafiq',
+        appUserModelId: _aumid,
+        guid: _winGuid,
+      );
+      const settings = InitializationSettings(
+        android: androidSettings,
+        linux: linuxSettings,
+        windows: windowsSettings,
+      );
       final ok = await _plugin.initialize(settings);
       _initialized = ok ?? false;
       return _initialized;
@@ -52,7 +78,8 @@ class NotificationService {
   ///
   /// Returns true when notifications are allowed (either already granted or
   /// newly granted). Returns false when the user denies or the platform
-  /// reports notifications disabled.
+  /// reports notifications disabled. Non-Android platforms return true
+  /// (no runtime permission model for local notifications).
   Future<bool> requestPermission() async {
     try {
       final android = _plugin
@@ -70,9 +97,10 @@ class NotificationService {
   /// Schedules (or replaces) the daily reminder at the given local time.
   ///
   /// Uses inexact scheduling — no exact-alarm permission required. Must be
-  /// called after [init] has succeeded.
+  /// called after [init] has succeeded. Returns false when the platform does
+  /// not support scheduling (Linux).
   Future<bool> scheduleDaily({required int hour, required int minute}) async {
-    if (!_initialized) return false;
+    if (!_initialized || !supportsScheduling) return false;
     try {
       // Cancel any previous schedule first — rescheduling replaces.
       await _plugin.cancel(_reminderId);
@@ -89,6 +117,7 @@ class NotificationService {
           importance: Importance.defaultImportance,
           priority: Priority.defaultPriority,
         ),
+        windows: WindowsNotificationDetails(),
       );
 
       // ponytail: inexact window (system-defined, typically ≤15min skew);

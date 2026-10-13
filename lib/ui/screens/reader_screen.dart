@@ -87,9 +87,21 @@ class _ReaderScreenState extends State<ReaderScreen> {
       if (!mounted) return;
       if (result.status == ShareResultStatus.success) {
         _showMessage('تمت المشاركة');
-      } else if (result.status == ShareResultStatus.unavailable) {
-        _showMessage('تعذّرت المشاركة');
+      } else {
+        await _copyForShareFallback();
       }
+    } catch (_) {
+      if (!mounted) return;
+      await _copyForShareFallback();
+    }
+  }
+
+  /// Desktop/headless fallback: when the share sheet is unavailable, copy the
+  /// text instead so the user still gets the content.
+  Future<void> _copyForShareFallback() async {
+    try {
+      await Clipboard.setData(ClipboardData(text: buildShareText(_entry)));
+      if (mounted) _showMessage('تعذّرت المشاركة — تم نسخ المحتوى');
     } catch (_) {
       if (mounted) _showMessage('تعذّرت المشاركة');
     }

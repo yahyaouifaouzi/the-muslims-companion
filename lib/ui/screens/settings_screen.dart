@@ -39,10 +39,23 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _ReminderCard(
-            reminder: reminder,
-            notificationService: notificationService,
-          ),
+          if (notificationService.supportsScheduling)
+            _ReminderCard(
+              reminder: reminder,
+              notificationService: notificationService,
+            )
+          else
+            Card(
+              child: Padding(
+                padding: const EdgeInsetsDirectional.all(16),
+                child: Text(
+                  'التذكير اليومي غير مدعوم على هذا النظام.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
           const SizedBox(height: 24),
           Text('عام', style: theme.textTheme.titleLarge),
           const SizedBox(height: 12),

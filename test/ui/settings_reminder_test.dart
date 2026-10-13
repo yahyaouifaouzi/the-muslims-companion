@@ -14,6 +14,10 @@ class FakeNotificationService implements NotificationService {
   int? lastHour;
   int? lastMinute;
   bool cancelled = false;
+  bool schedulingSupported = true;
+
+  @override
+  bool get supportsScheduling => schedulingSupported;
 
   @override
   Future<bool> init() async => true;
@@ -64,6 +68,25 @@ void main() {
     expect(find.text('تذكير يومي'), findsOneWidget);
     expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
     expect(find.text('وقت التذكير'), findsNothing);
+  });
+
+  testWidgets('unsupported platform hides the reminder card', (tester) async {
+    final fake = FakeNotificationService()..schedulingSupported = false;
+    await tester.pumpWidget(
+      MuslimCompanionApp(
+        contentRepository: LocalContentRepository(loader: fixtureLoader),
+        notificationService: fake,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('الإعدادات'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Switch), findsNothing);
+    expect(
+      find.text('التذكير اليومي غير مدعوم على هذا النظام.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('denied permission keeps the reminder off with a message', (
