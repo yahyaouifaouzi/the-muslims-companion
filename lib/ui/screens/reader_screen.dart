@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../app/favorites_store.dart';
 import '../../content/models/content_entry.dart';
 import '../widgets/state_views.dart' show PlaceholderBadge;
 
@@ -96,11 +98,18 @@ class _ReaderScreenState extends State<ReaderScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final source = _entry.source;
+    final favorites = context.watch<FavoritesStore>();
+    final isFavorite = favorites.contains(_entry.id);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_entry.title),
         actions: [
+          IconButton(
+            icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
+            tooltip: isFavorite ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة',
+            onPressed: () => favorites.toggle(_entry.id),
+          ),
           IconButton(
             icon: const Icon(Icons.text_decrease),
             tooltip: 'تصغير الخط',

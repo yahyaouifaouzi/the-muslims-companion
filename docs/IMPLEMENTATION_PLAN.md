@@ -1,7 +1,7 @@
 # Implementation Plan — رفيق المسلم (The Muslim's Companion)
 
-Status: **Re-inspected during Prompt 00 (2026-10-13); updated after Prompt 05.**
-Milestones 01–05 are implemented; checks are green. Next up: Prompt 06.
+Status: **Re-inspected during Prompt 00 (2026-10-13); updated after Prompt 06.**
+Milestones 01–06 are implemented; checks are green. Next up: Prompt 07.
 
 ## 1. Current environment
 
@@ -20,6 +20,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 
 - `lib/main.dart` — app shell: `ar` locale, RTL, Material 3 theme, provider wiring.
 - `lib/app/` — `content_provider.dart` (loading/error/catalog states),
+  `favorites_store.dart` (persisted favorite IDs),
   `theme/app_theme.dart` (green/off-white/beige).
 - `lib/content/` — typed models + `LocalContentRepository` with file allow-list
   (`kAllowedContentFiles`), cross-validation, typed `ContentException`,
@@ -31,10 +32,11 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
   registered in `pubspec.yaml`.
 - `docs/CONTENT_SCHEMA.md` — JSON contract (schemaVersion vs contentVersion,
   placeholder policy).
-- `test/` — 4 files, **46 tests, all passing**: model parsing/validation,
+- `test/` — 7 files, **63 tests, all passing**: model parsing/validation,
   repository fixtures (valid/missing/duplicate/malformed), shell/RTL/empty/
-  error widget tests, reader font-bound/share-text tests, real-asset smoke
-  test.
+  error widget tests, reader font-bound/share-text tests, Arabic search
+  normalization/matching, favorites persistence + stale-ID resolution, and
+  real-asset smoke test.
 - `README.md` — setup, run, and check commands.
 - `AGENTS.md` / `GEMINI.md` / `.claude/` / `opencode.json` — agent tooling
   (graft context graph) added by the `MCP` commit; `graft/` is local-only
@@ -49,7 +51,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 | 03 | Local content repository (allow-list, typed errors, tests) | ✅ Done (commit `03`) |
 | 04 | App shell, home/categories/detail, states, widget tests | ✅ Done (commit `04`) |
 | 05 | Reader screen: font size, copy/share, verbatim Arabic | ✅ Done (new `lib/ui/screens/reader_screen.dart`) |
-| 06 | Search + Arabic normalization + persistent favorites | ⬜ Not started (search is an entry-point stub; Favorites tab shows empty state) |
+| 06 | Search + Arabic normalization + persistent favorites | ✅ Done (`search_screen.dart`, `favorites_store.dart`; shared `EntryCard`) |
 | 07 | Adhkar repetition counter | ⬜ Not started |
 | 08 | Hybrid remote JSON updates + offline cache/rollback | ⬜ Not started (repo is local-only; `http`/`path_provider` not yet deps) |
 | 09 | Daily local notifications + settings | ⬜ Not started (no `flutter_local_notifications` dep) |
@@ -60,7 +62,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 
 - `flutter doctor` → No issues found ✓
 - `flutter analyze` → No issues found (exit 0) ✓
-- `flutter test` → 46/46 passed (exit 0) ✓
+- `flutter test` → 63/63 passed (exit 0) ✓
 
 ### Known gaps / housekeeping
 
@@ -69,8 +71,6 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
   (Prompt 11 scope).
 - `pubspec.yaml` description still says "Milestone 1 (foundation)" — stale
   wording, cosmetic.
-- `shared_preferences` is installed but unused in `lib/` yet — reserved for
-  Prompt 06 (favorites persistence); `share_plus` is now used by the reader.
 - `docs/IMPLEMENTATION_PLAN.md` milestones 08/09 mention docs
   (`CONTENT_PUBLISHING.md`, `RELEASE_CHECKLIST.md`) that don't exist yet.
 
@@ -93,8 +93,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 
 ## 4. Immediate next action
 
-Send **Prompt 06** (search, Arabic normalization, persistent favorites) from
-`CLAUDE_CODE_PROMPTS.md`. Starting points: the search stub snackbar in
-`home_screen.dart`, the empty `favorites_screen.dart`, and the unused
-`shared_preferences` dependency. Preserve the green working tree and the 46
-passing tests.
+Send **Prompt 07** (adhkar repetition counter) from `CLAUDE_CODE_PROMPTS.md`.
+Starting points: `repeatCount` on `ContentEntry` (validated, usually null),
+the reader screen actions bar, and `shared_preferences` (already used by
+`FavoritesStore`). Preserve the green working tree and the 63 passing tests.

@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'app/content_provider.dart';
+import 'app/favorites_store.dart';
 import 'app/theme/app_theme.dart';
 import 'content/local_content_repository.dart';
 import 'ui/screens/main_shell.dart';
@@ -17,17 +18,31 @@ void main() {
 /// widgets should stay Directionality-aware (EdgeInsetsDirectional,
 /// AlignmentDirectional, end/start alignment) instead of hardcoding left/right.
 class MuslimCompanionApp extends StatelessWidget {
-  const MuslimCompanionApp({super.key, this.contentRepository});
+  const MuslimCompanionApp({
+    super.key,
+    this.contentRepository,
+    this.favoritesStore,
+  });
 
   /// Injectable for tests; the real repository reads bundled assets.
   final LocalContentRepository? contentRepository;
+
+  /// Injectable for tests; the real store persists via shared_preferences.
+  final FavoritesStore? favoritesStore;
 
   static const String appTitle = 'رفيق المسلم';
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ContentProvider(repository: contentRepository)..load(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => ContentProvider(repository: contentRepository)..load(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => (favoritesStore ?? FavoritesStore())..load(),
+        ),
+      ],
       child: MaterialApp(
         title: appTitle,
         debugShowCheckedModeBanner: false,

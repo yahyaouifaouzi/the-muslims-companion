@@ -9,6 +9,7 @@ import '../widgets/state_views.dart';
 import 'categories_screen.dart';
 import 'category_detail_screen.dart';
 import 'reader_screen.dart';
+import 'search_screen.dart';
 
 /// Home: app title, greeting, search entry point, featured content (only if
 /// valid content exists), and category cards rendered from the loaded catalog.
@@ -104,8 +105,7 @@ class _HomeBody extends StatelessWidget {
   }
 }
 
-/// Search entry point. Search itself lands in a later milestone; for now it
-/// gives clear feedback instead of pretending to search.
+/// Search entry point: opens the full in-memory search screen.
 class _SearchEntryPoint extends StatelessWidget {
   const _SearchEntryPoint();
 
@@ -115,9 +115,7 @@ class _SearchEntryPoint extends StatelessWidget {
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
-        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('البحث قادم في مرحلة لاحقة')),
-        ),
+        onTap: () => Navigator.of(context).push(SearchScreen.route()),
         child: Padding(
           padding: const EdgeInsetsDirectional.all(14),
           child: Row(
