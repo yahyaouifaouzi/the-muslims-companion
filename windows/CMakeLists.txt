@@ -32,6 +32,12 @@ set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE}")
 # Use Unicode for all projects.
 add_definitions(-DUNICODE -D_UNICODE)
 
+# flutter_local_notifications_windows uses C++/WinRT, which pulls in MSVC's
+# <experimental/coroutine>. On modern MSVC (VS 2022 17.x+/VS 18) that header
+# hard-errors (STL1011) unless this is defined. Windows builds are experimental,
+# so silencing the deprecation is enough to keep the release pipeline green.
+add_definitions(-D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
+
 # Compilation settings that should be applied to most targets.
 #
 # Be cautious about adding new options here, as plugins use this function by
