@@ -32,6 +32,9 @@ class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
+      // Bundled OFL Arabic font so religious text with diacritics renders
+      // correctly on every platform (desktop distros may lack Arabic fonts).
+      fontFamily: 'NotoNaskhArabic',
       colorScheme: scheme,
       scaffoldBackgroundColor: offWhite,
       appBarTheme: const AppBarTheme(
