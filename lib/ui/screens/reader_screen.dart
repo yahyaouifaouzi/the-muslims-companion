@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../app/favorites_store.dart';
 import '../../content/models/content_entry.dart';
+import '../widgets/counter_section.dart';
 import '../widgets/state_views.dart' show PlaceholderBadge;
 
 /// Text composed for copy/share: title, body, optional verified reference,
@@ -166,6 +167,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
                     ),
                   ),
                 ],
+                const SizedBox(height: 32),
+                CounterSection(entry: _entry),
               ],
             ),
           ),

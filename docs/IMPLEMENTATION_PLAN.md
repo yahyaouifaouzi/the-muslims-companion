@@ -1,7 +1,7 @@
 # Implementation Plan — رفيق المسلم (The Muslim's Companion)
 
-Status: **Re-inspected during Prompt 00 (2026-10-13); updated after Prompt 06.**
-Milestones 01–06 are implemented; checks are green. Next up: Prompt 07.
+Status: **Re-inspected during Prompt 00 (2026-10-13); updated after Prompt 07.**
+Milestones 01–07 are implemented; checks are green. Next up: Prompt 08.
 
 ## 1. Current environment
 
@@ -21,6 +21,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 - `lib/main.dart` — app shell: `ar` locale, RTL, Material 3 theme, provider wiring.
 - `lib/app/` — `content_provider.dart` (loading/error/catalog states),
   `favorites_store.dart` (persisted favorite IDs),
+  `counter_store.dart` (persisted repetition counts + user-defined targets),
   `theme/app_theme.dart` (green/off-white/beige).
 - `lib/content/` — typed models + `LocalContentRepository` with file allow-list
   (`kAllowedContentFiles`), cross-validation, typed `ContentException`,
@@ -32,11 +33,11 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
   registered in `pubspec.yaml`.
 - `docs/CONTENT_SCHEMA.md` — JSON contract (schemaVersion vs contentVersion,
   placeholder policy).
-- `test/` — 7 files, **63 tests, all passing**: model parsing/validation,
+- `test/` — 8 files, **76 tests, all passing**: model parsing/validation,
   repository fixtures (valid/missing/duplicate/malformed), shell/RTL/empty/
   error widget tests, reader font-bound/share-text tests, Arabic search
-  normalization/matching, favorites persistence + stale-ID resolution, and
-  real-asset smoke test.
+  normalization/matching, favorites persistence + stale-ID resolution,
+  counter increment/reset/persistence/completion, and real-asset smoke test.
 - `README.md` — setup, run, and check commands.
 - `AGENTS.md` / `GEMINI.md` / `.claude/` / `opencode.json` — agent tooling
   (graft context graph) added by the `MCP` commit; `graft/` is local-only
@@ -52,7 +53,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 | 04 | App shell, home/categories/detail, states, widget tests | ✅ Done (commit `04`) |
 | 05 | Reader screen: font size, copy/share, verbatim Arabic | ✅ Done (new `lib/ui/screens/reader_screen.dart`) |
 | 06 | Search + Arabic normalization + persistent favorites | ✅ Done (`search_screen.dart`, `favorites_store.dart`; shared `EntryCard`) |
-| 07 | Adhkar repetition counter | ⬜ Not started |
+| 07 | Adhkar repetition counter | ✅ Done (`counter_store.dart`, `counter_section.dart`; large tap target) |
 | 08 | Hybrid remote JSON updates + offline cache/rollback | ⬜ Not started (repo is local-only; `http`/`path_provider` not yet deps) |
 | 09 | Daily local notifications + settings | ⬜ Not started (no `flutter_local_notifications` dep) |
 | 10 | Accessibility & polish pass | ⬜ Not started |
@@ -62,7 +63,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 
 - `flutter doctor` → No issues found ✓
 - `flutter analyze` → No issues found (exit 0) ✓
-- `flutter test` → 63/63 passed (exit 0) ✓
+- `flutter test` → 76/76 passed (exit 0) ✓
 
 ### Known gaps / housekeeping
 
@@ -93,7 +94,8 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 
 ## 4. Immediate next action
 
-Send **Prompt 07** (adhkar repetition counter) from `CLAUDE_CODE_PROMPTS.md`.
-Starting points: `repeatCount` on `ContentEntry` (validated, usually null),
-the reader screen actions bar, and `shared_preferences` (already used by
-`FavoritesStore`). Preserve the green working tree and the 63 passing tests.
+Send **Prompt 08** (hybrid remote JSON updates + offline cache/rollback) from
+`CLAUDE_CODE_PROMPTS.md`. This is a high-risk data-integrity milestone —
+inspect `LocalContentRepository` and its tests before changing anything.
+New deps likely needed: `http`, `path_provider`. Preserve the green working
+tree and the 76 passing tests.

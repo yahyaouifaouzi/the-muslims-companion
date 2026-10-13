@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'app/content_provider.dart';
+import 'app/counter_store.dart';
 import 'app/favorites_store.dart';
 import 'app/theme/app_theme.dart';
 import 'content/local_content_repository.dart';
@@ -22,6 +23,7 @@ class MuslimCompanionApp extends StatelessWidget {
     super.key,
     this.contentRepository,
     this.favoritesStore,
+    this.counterStore,
   });
 
   /// Injectable for tests; the real repository reads bundled assets.
@@ -29,6 +31,9 @@ class MuslimCompanionApp extends StatelessWidget {
 
   /// Injectable for tests; the real store persists via shared_preferences.
   final FavoritesStore? favoritesStore;
+
+  /// Injectable for tests; the real store persists via shared_preferences.
+  final CounterStore? counterStore;
 
   static const String appTitle = 'رفيق المسلم';
 
@@ -41,6 +46,9 @@ class MuslimCompanionApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => (favoritesStore ?? FavoritesStore())..load(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => (counterStore ?? CounterStore())..load(),
         ),
       ],
       child: MaterialApp(

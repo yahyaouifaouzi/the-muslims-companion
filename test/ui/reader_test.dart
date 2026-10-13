@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:the_muslims_companion/app/counter_store.dart';
 import 'package:the_muslims_companion/app/favorites_store.dart';
 import 'package:the_muslims_companion/content/local_content_repository.dart';
 import 'package:the_muslims_companion/content/models/content_entry.dart';
@@ -30,8 +31,11 @@ ContentEntry _entry({bool withSource = false, bool placeholder = false}) =>
           : null,
     );
 
-Widget _readerWidget(ContentEntry entry) => ChangeNotifierProvider(
-  create: (_) => FavoritesStore(),
+Widget _readerWidget(ContentEntry entry) => MultiProvider(
+  providers: [
+    ChangeNotifierProvider(create: (_) => FavoritesStore()),
+    ChangeNotifierProvider(create: (_) => CounterStore()),
+  ],
   child: MaterialApp(home: ReaderScreen(entry: entry)),
 );
 
