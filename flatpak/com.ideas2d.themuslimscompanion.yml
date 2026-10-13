@@ -1,0 +1,45 @@
+# Flatpak manifest for Rafiq (رفيق المسلم).
+#
+# Build from the repo root (after `flutter build linux --release`):
+#   flatpak-builder --user --install --force-clean build/flatpak \
+#     flatpak/com.ideas2d.themuslimscompanion.yml
+#
+# The Flutter bundle is staged via a local dir source; for Flathub the
+# bundle would be published as a release tarball and referenced by url+sha256.
+app-id: com.ideas2d.themuslimscompanion
+runtime: org.gnome.Platform
+runtime-version: '47'
+sdk: org.gnome.Sdk
+command: rafiq
+
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
+  - --device=dri
+
+modules:
+  - name: rafiq
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/rafiq
+      - cp -a the_muslims_companion lib data native_assets.json /app/lib/rafiq/
+      - install -Dm755 rafiq-wrapper.sh /app/bin/rafiq
+      - install -Dm644 com.ideas2d.themuslimscompanion.desktop
+        /app/share/applications/com.ideas2d.themuslimscompanion.desktop
+      - install -Dm644 com.ideas2d.themuslimscompanion.metainfo.xml
+        /app/share/metainfo/com.ideas2d.themuslimscompanion.metainfo.xml
+      - install -Dm644 icon-192.png
+        /app/share/icons/hicolor/192x192/apps/com.ideas2d.themuslimscompanion.png
+    sources:
+      - type: dir
+        path: ../build/linux/x64/release/bundle
+      - type: file
+        path: rafiq-wrapper.sh
+      - type: file
+        path: ../packaging/deb/com.ideas2d.themuslimscompanion.desktop
+      - type: file
+        path: ../packaging/deb/com.ideas2d.themuslimscompanion.metainfo.xml
+      - type: file
+        path: ../android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+        dest-filename: icon-192.png
