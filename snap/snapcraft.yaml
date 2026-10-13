@@ -1,0 +1,57 @@
+name: rafiq
+base: core22
+version: '1.0.0'
+summary: Muslim companion — morning/evening adhkar, prayer counter, favorites
+description: |
+  Rafiq (رفيق المسلم) is an offline Muslim companion app. It provides
+  morning and evening adhkar from bundled sources, a prayer counter
+  (tasbih), favorites, and search — all in Arabic with a clean
+  green/off-white interface.
+
+  Features:
+  - Morning and evening adhkar with source attribution
+  - Prayer counter (tasbih) with persistent state
+  - Favorites and full-text search
+  - Optional daily reminder (where supported)
+  - Adjustable reading font size
+  - Fully offline — no account, no analytics, no ads
+
+grade: stable
+confinement: strict
+license: MIT
+
+plugs:
+  desktop:
+  desktop-legacy:
+  wayland:
+  x11:
+  gtk-3-themes:
+  icon-themes:
+  sound-themes:
+  home:
+
+parts:
+  rafiq:
+    plugin: dump
+    source: build/linux/x64/release/bundle
+    organize:
+      the_muslims_companion: bin/rafiq
+    stage-packages:
+      - libgtk-3-0
+      - libblkid1
+      - liblzma5
+  desktop-files:
+    plugin: dump
+    source: packaging/deb
+    organize:
+      com.ideas2d.themuslimscompanion.desktop: usr/share/applications/com.ideas2d.themuslimscompanion.desktop
+    override-build: |
+      craftctl default
+      install -Dm644 "$CRAFT_PROJECT_DIR/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" \
+        "$CRAFT_PART_INSTALL/usr/share/icons/hicolor/192x192/apps/com.ideas2d.themuslimscompanion.png"
+
+apps:
+  rafiq:
+    command: bin/rafiq
+    extensions: [gnome]
+    desktop: usr/share/applications/com.ideas2d.themuslimscompanion.desktop
