@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "dhikr-subhanallah",
+      "categoryId": "adhkar-morning",
+      "title": "تسبيح",
+      "text": "سبحان الله وبحمده",
+      "tags": ["تسبيح"],
+      "sortOrder": 1,
+      "verified": true,
+      "placeholder": false
+    },
+    {
+      "id": "dhikr-tawhid",
+      "categoryId": "adhkar-morning",
+      "title": "كلمة التوحيد",
+      "text": "لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير",
+      "tags": ["توحيد"],
+      "sortOrder": 2,
+      "verified": true,
+      "placeholder": false
+    },
+    {
+      "id": "dhikr-morning-demo-placeholder",
+      "categoryId": "adhkar-morning",
+      "title": "محتوى تجريبي (غير موثّق)",
+      "text": "[محتوى تجريبي للعرض فقط — ذكر غير موثّق، يُستبدل بمحتوى مراجَع لاحقاً]",
+      "tags": ["تجريبي"],
+      "sortOrder": 3,
+      "verified": false,
+      "placeholder": true
+    },
+    {
+      "id": "dhikr-istighfar",
+      "categoryId": "adhkar-evening",
+      "title": "استغفار",
+      "text": "أستغفر الله وأتوب إليه",
+      "tags": ["استغفار"],
+      "sortOrder": 1,
+      "verified": true,
+      "placeholder": false
+    },
+    {
+      "id": "dhikr-evening-demo-placeholder",
+      "categoryId": "adhkar-evening",
+      "title": "محتوى تجريبي (غير موثّق)",
+      "text": "[محتوى تجريبي للعرض فقط — ذكر غير موثّق، يُستبدل بمحتوى مراجَع لاحقاً]",
+      "tags": ["تجريبي"],
+      "sortOrder": 2,
+      "verified": false,
+      "placeholder": true
+    }
+  ]
+}

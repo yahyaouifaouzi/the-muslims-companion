@@ -1,5 +1,0 @@
-# Second-milestone workspace placeholder.
-
-Bundled content JSON files (manifest.json, categories.json, duas.json,
-hadiths.json, adhkar.json) are added here in the next milestone (Prompt 02).
-The folder is registered as a Flutter asset directory in pubspec.yaml.

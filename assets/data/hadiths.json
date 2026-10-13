@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "hadith-niyyah",
+      "categoryId": "hadiths",
+      "title": "انما الأعمال بالنّيات",
+      "text": "إنّما الأعمال بالنّيات، وإنّما لكلّ امرئٍ ما نوى",
+      "source": {
+        "reference": "صحيح البخاري 1، صحيح مسلم 1907",
+        "kind": "hadith",
+        "authenticity": "صحيح"
+      },
+      "tags": ["نوايا", "حديث"],
+      "sortOrder": 1,
+      "verified": true,
+      "placeholder": false
+    },
+    {
+      "id": "hadith-demo-placeholder",
+      "categoryId": "hadiths",
+      "title": "محتوى تجريبي (غير موثّق)",
+      "text": "[محتوى تجريبي للعرض فقط — نص حديث غير موثّق، يُستبدل بمحتوى مراجَع لاحقاً]",
+      "tags": ["تجريبي"],
+      "sortOrder": 2,
+      "verified": false,
+      "placeholder": true
+    }
+  ]
+}

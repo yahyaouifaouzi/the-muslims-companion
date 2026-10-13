@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "dua-q2-201",
+      "categoryId": "duas-quran",
+      "title": "دعاء طلب الخير في الدنيا والآخرة",
+      "text": "ربّنا آتنا في الدنيا حسنةً وفي الآخرة حسنةً وقِنا عذاب النار",
+      "source": { "reference": "سورة البقرة، آية 201", "kind": "quran" },
+      "tags": ["خير", "دنيا", "آخرة", "قرآن"],
+      "sortOrder": 1,
+      "verified": true,
+      "placeholder": false
+    },
+    {
+      "id": "dua-q14-40",
+      "categoryId": "duas-quran",
+      "title": "دعاء إقامة الصلاة وتقبّل الدعاء",
+      "text": "ربّ اجعلني مُقيمَ الصلاة ومن ذُرّيّتي، ربّنا وتقبّل دُعاء",
+      "source": { "reference": "سورة إبراهيم، آية 40", "kind": "quran" },
+      "tags": ["صلاة", "قيام", "قرآن"],
+      "sortOrder": 2,
+      "verified": true,
+      "placeholder": false
+    },
+    {
+      "id": "dua-demo-placeholder",
+      "categoryId": "duas-general",
+      "title": "محتوى تجريبي (غير موثّق)",
+      "text": "[محتوى تجريبي للعرض فقط — نص دعاء غير موثّق، يُستبدل بمحتوى مراجَع لاحقاً]",
+      "tags": ["تجريبي"],
+      "sortOrder": 1,
+      "verified": false,
+      "placeholder": true
+    }
+  ]
+}

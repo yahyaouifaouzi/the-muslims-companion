@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "updatedAt": "2026-10-13",
+  "files": ["categories.json", "duas.json", "hadiths.json", "adhkar.json"]
+}

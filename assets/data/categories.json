@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "categories": [
+    {
+      "id": "adhkar-morning",
+      "title": "أذكار الصباح",
+      "subtitle": "أذكار تُقال في أوقات الصباح",
+      "iconKey": "sunrise",
+      "contentFile": "adhkar.json",
+      "sortOrder": 1,
+      "enabled": true
+    },
+    {
+      "id": "adhkar-evening",
+      "title": "أذكار المساء",
+      "subtitle": "أذكار تُقال في أوقات المساء",
+      "iconKey": "moon",
+      "contentFile": "adhkar.json",
+      "sortOrder": 2,
+      "enabled": true
+    },
+    {
+      "id": "duas-quran",
+      "title": "أدعية قرآنية",
+      "subtitle": "أدعية ترد في القرآن الكريم",
+      "iconKey": "quran",
+      "contentFile": "duas.json",
+      "sortOrder": 3,
+      "enabled": true
+    },
+    {
+      "id": "duas-general",
+      "title": "أدعية عامة",
+      "subtitle": "أدعية متنوعة",
+      "iconKey": "hands",
+      "contentFile": "duas.json",
+      "sortOrder": 4,
+      "enabled": true
+    },
+    {
+      "id": "hadiths",
+      "title": "أحاديث نبوية",
+      "subtitle": "نصوص من السنة النبوية",
+      "iconKey": "book",
+      "contentFile": "hadiths.json",
+      "sortOrder": 5,
+      "enabled": true
+    }
+  ]
+}
