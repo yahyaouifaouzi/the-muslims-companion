@@ -159,6 +159,29 @@ void main() {
       expect(all.length, 4);
       expect(all.where((e) => e.placeholder).length, 1);
     });
+
+    test(
+      'excludeUnverified (release mode) drops placeholder/unverified entries '
+      'but still validates every entry',
+      () async {
+        final repository = LocalContentRepository(
+          loader: loaderFor(_validFixture()),
+          excludeUnverified: true,
+        );
+
+        final catalog = await repository.loadCatalog();
+        expect(catalog.allEntries.map((e) => e.id), [
+          'dua-a',
+          'dhikr-a',
+          'dua-b',
+        ]);
+        expect(catalog.allEntries.any((e) => e.placeholder), isFalse);
+        expect(catalog.allEntries.any((e) => !e.verified), isFalse);
+        expect(catalog.entriesByCategory['adhkar-morning']!.map((e) => e.id), [
+          'dhikr-a',
+        ]);
+      },
+    );
   });
 
   group('error handling', () {

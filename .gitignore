@@ -49,3 +49,8 @@ app.*.map.json
 
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
+
+# Signing material — never commit (see docs/RELEASE_CHECKLIST.md)
+android/key.properties
+*.jks
+*.keystore

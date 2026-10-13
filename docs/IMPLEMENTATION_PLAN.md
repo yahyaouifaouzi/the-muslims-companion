@@ -1,7 +1,7 @@
 # Implementation Plan — رفيق المسلم (The Muslim's Companion)
 
-Status: **Re-inspected during Prompt 00 (2026-10-13); updated after Prompt 10.**
-Milestones 01–10 are implemented; checks are green. Next up: Prompt 11.
+Status: **Re-inspected during Prompt 00 (2026-10-13); updated after Prompt 11 (final milestone).**
+Milestones 01–11 are implemented; checks are green. All prompts complete.
 
 ## 1. Current environment
 
@@ -38,7 +38,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 - `docs/CONTENT_SCHEMA.md` — JSON contract (schemaVersion vs contentVersion,
   placeholder policy).
 - `docs/CONTENT_PUBLISHING.md` — how to host and publish a content release.
-- `test/` — 16 files, **120 tests, all passing**: model parsing/validation,
+- `test/` — 16 files, **121 tests, all passing**: model parsing/validation,
   repository fixtures (valid/missing/duplicate/malformed), shell/RTL/empty/
   error widget tests, reader font-bound/share-text tests, Arabic search
   normalization/matching, favorites persistence + stale-ID resolution,
@@ -67,13 +67,17 @@ direction, search performance on 5000 entries, and real-asset smoke test.
 | 08 | Hybrid remote JSON updates + offline cache/rollback | ✅ Done (`content/refresh/`: cache, client, service; Settings refresh UI) |
 | 09 | Daily local notifications + settings | ✅ Done (`reminder_store.dart`, `notification_service.dart`, Settings reminder section; inexact-only scheduling) |
 | 10 | Accessibility & polish pass | ✅ Done (desugaring config, RTL chevron fix, reminder flow + search perf tests) |
-| 11 | Release readiness (identity, signing, checklist) | ⬜ Not started |
+| 11 | Release readiness (identity, signing, checklist) | ✅ Done (applicationId `com.ideas2d.themuslimscompanion`, Arabic label, INTERNET perm, release-only content exclusion, `docs/RELEASE_CHECKLIST.md`, release `.aab` built) |
 
 ### Baseline checks (run this session)
 
 - `flutter doctor` → No issues found ✓
 - `flutter analyze` → No issues found (exit 0) ✓
-- `flutter test` → 120/120 passed (exit 0) ✓
+- `flutter test` → 121/121 passed (exit 0) ✓
+- `flutter build appbundle --release` → ✓ Built
+  `build/app/outputs/bundle/release/app-release.aab` (53.5 MB, debug-key
+  signed until a release keystore is configured — see
+  `docs/RELEASE_CHECKLIST.md`)
 - `flutter build apk --debug` → ✓ Built
   `build/app/outputs/flutter-apk/app-debug.apk` (187 MB; warning only: the
   `flutter_timezone` plugin applies Kotlin Gradle Plugin — upstream plugin
@@ -81,19 +85,17 @@ direction, search performance on 5000 entries, and real-asset smoke test.
 
 ### Known gaps / housekeeping
 
-- Android identity still template values: `applicationId =
-  com.example.the_muslims_companion`, launcher label `the_muslims_companion`
-  (Prompt 11 scope).
 - `pubspec.yaml` description still says "Milestone 1 (foundation)" — stale
   wording, cosmetic.
-- `docs/IMPLEMENTATION_PLAN.md` milestone 09 mentions a doc
-  (`RELEASE_CHECKLIST.md`) that doesn't exist yet.
 - `kContentBaseUrl` in `main.dart` is a placeholder
   (`https://content.example.com/v1`) — must be replaced with the real content
   host before release (see `docs/CONTENT_PUBLISHING.md`).
 - No cryptographic content integrity — relies on HTTPS + full validation
   only. Signed content is a future enhancement, documented in
   `CONTENT_PUBLISHING.md`.
+- Open store-submission blockers are tracked in
+  `docs/RELEASE_CHECKLIST.md` §7 (icon, keystore, real host, Play identity,
+  on-device notification/refresh verification).
 
 ## 3. Architecture rules (carried across all milestones)
 
@@ -114,8 +116,30 @@ direction, search performance on 5000 entries, and real-asset smoke test.
 
 ## 4. Immediate next action
 
-Send **Prompt 11** (release readiness) from `CLAUDE_CODE_PROMPTS.md`.
-Preserve the green working tree and the 120 passing tests.
+All prompts (00–11) are complete. Remaining work is outside the repo's code
+scope: content verification passes, keystore setup, real content host, icon
+design, and on-device testing — tracked in `docs/RELEASE_CHECKLIST.md`.
+
+### Prompt 11 notes (release readiness)
+
+- Identity: `applicationId`/`namespace` → `com.ideas2d.themuslimscompanion`
+  (user-chosen), launcher label → `رفيق المسلم`, `MainActivity.kt` moved to
+  the matching package path. Version stays `1.0.0+1`.
+- Fixed: `INTERNET` permission existed only in debug/profile manifests —
+  release builds could never reach the content host. Added to the main
+  manifest (the app's only network use is optional content refresh).
+- Content: `LocalContentRepository` now takes `excludeUnverified`
+  (defaults to `kReleaseMode`) — release builds validate but never render
+  `placeholder`/`!verified` entries. Bundled demo entries remain visible in
+  dev/debug with the "غير موثّق" badge. All 10 bundled entries carry an
+  explicit `verified` flag (verified by script).
+- Signing: documented machine-local `key.properties` + keystore flow in
+  `docs/RELEASE_CHECKLIST.md`; `.gitignore` now blocks `android/key.properties`,
+  `*.jks`, `*.keystore`. The built `.aab` is debug-key signed (expected).
+- Merged release manifest audited: exactly `INTERNET`, `POST_NOTIFICATIONS`,
+  `RECEIVE_BOOT_COMPLETED`, `VIBRATE` (+ AndroidX internal) — no extras.
+- Release artifact: `build/app/outputs/bundle/release/app-release.aab`
+  (53.5 MB) — built, **not uploaded, not store-approved**.
 
 ### Prompt 10 notes (accessibility/quality pass)
 

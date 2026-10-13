@@ -1,11 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Optional content refresh (HTTPS fetch of JSON releases). No other
+         network use; the app is fully functional offline. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Daily reminder (inexact): runtime permission on Android 13+, plus the
          plugin's boot receiver so scheduled reminders survive reboot.
          No SCHEDULE_EXACT_ALARM — inexact scheduling only. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
-        android:label="the_muslims_companion"
+        android:label="رفيق المسلم"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

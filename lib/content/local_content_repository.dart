@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter/services.dart' show rootBundle;
 
 import 'content_exception.dart';
@@ -53,12 +54,17 @@ class ContentCatalog {
 /// of returning empty results. Country of truth stays the models: widgets
 /// never see raw JSON maps.
 class LocalContentRepository {
-  LocalContentRepository({JsonDocumentLoader? loader})
-    : _loadJson = loader ?? _defaultLoader;
+  LocalContentRepository({JsonDocumentLoader? loader, bool? excludeUnverified})
+    : _loadJson = loader ?? _defaultLoader,
+      // Release builds must never show unverified/placeholder religious text:
+      // it is validated (dedup/category checks still run on every entry) but
+      // excluded from the rendered catalog.
+      _excludeUnverified = excludeUnverified ?? kReleaseMode;
 
   static const String _base = 'assets/data';
 
   final JsonDocumentLoader _loadJson;
+  final bool _excludeUnverified;
 
   /// Loads and cross-validates the whole bundled snapshot.
   Future<ContentCatalog> loadCatalog() async {
@@ -96,6 +102,9 @@ class LocalContentRepository {
             '$fileName: entry "${entry.id}" references category id '
             '"${entry.categoryId}" that does not belong to this file.',
           );
+        }
+        if (_excludeUnverified && (entry.placeholder || !entry.verified)) {
+          continue;
         }
         allEntries.add(entry);
         entriesByCategory[entry.categoryId]!.add(entry);

@@ -1,4 +1,4 @@
-package com.example.the_muslims_companion
+package com.ideas2d.themuslimscompanion
 
 import io.flutter.embedding.android.FlutterActivity
 
