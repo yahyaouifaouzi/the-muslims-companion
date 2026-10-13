@@ -23,7 +23,7 @@ modules:
     buildsystem: simple
     build-commands:
       - mkdir -p /app/lib/rafiq
-      - cp -a the_muslims_companion lib data native_assets.json /app/lib/rafiq/
+      - cp -a the_muslims_companion lib data /app/lib/rafiq/
       - install -Dm755 rafiq-wrapper.sh /app/bin/rafiq
       - install -Dm644 com.ideas2d.themuslimscompanion.desktop
         /app/share/applications/com.ideas2d.themuslimscompanion.desktop
