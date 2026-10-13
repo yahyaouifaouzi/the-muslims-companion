@@ -37,9 +37,8 @@ but still point at a placeholder host (see [Project Status](#project-status)).
 
 ## Screenshots
 
-> **Note:** the app currently ships a single light theme (`AppTheme.light()`) —
-> there is no dark mode yet. Drop the captures listed below into
-> [`docs/screenshots/`](docs/screenshots/) and the images render automatically.
+> The app currently ships a single light theme (`AppTheme.light()`) — there is no
+> dark mode yet, so no dark-mode screenshot is shown.
 
 <table>
   <tr>
@@ -71,18 +70,6 @@ but still point at a placeholder host (see [Project Status](#project-status)).
     </td>
   </tr>
 </table>
-
-**Screenshots to capture** (save into `docs/screenshots/`):
-
-| File | What to capture |
-| ---- | --------------- |
-| `banner.png` | Wide banner (1280×640) — reuse the social preview artwork |
-| `home.png` | Home screen with the featured section |
-| `categories.png` | Categories list |
-| `dua-detail.png` | A dua in the reader view |
-| `adhkar-counter.png` | Adhkar counter in the reader |
-| `favorites.png` | Favorites screen |
-| `settings.png` | Settings with the daily-reminder card |
 
 ---
 
