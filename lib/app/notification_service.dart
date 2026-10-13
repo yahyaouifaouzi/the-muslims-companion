@@ -17,15 +17,12 @@ import 'reminder_store.dart';
 ///   the alarm each day.
 /// - **Tap opens the app** via the default launcher activity (no deep link).
 class NotificationService {
-  NotificationService({FlutterLocalNotificationsPlugin? plugin})
-    : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
-
   static const int _reminderId = 0;
 
-  final FlutterLocalNotificationsPlugin _plugin;
+  final FlutterLocalNotificationsPlugin _plugin =
+      FlutterLocalNotificationsPlugin();
 
   bool _initialized = false;
-  bool get initialized => _initialized;
 
   /// Initializes timezone handling and the notification plugin.
   ///
@@ -70,30 +67,11 @@ class NotificationService {
     }
   }
 
-  /// Returns true when notifications are enabled at the OS level.
-  Future<bool> areNotificationsEnabled() async {
-    try {
-      final android = _plugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >();
-      if (android == null) return true;
-      return await android.areNotificationsEnabled() ?? false;
-    } catch (_) {
-      return false;
-    }
-  }
-
   /// Schedules (or replaces) the daily reminder at the given local time.
   ///
   /// Uses inexact scheduling — no exact-alarm permission required. Must be
   /// called after [init] has succeeded.
-  Future<bool> scheduleDaily({
-    required int hour,
-    required int minute,
-    String title = 'رفيق المسلم',
-    String body = 'حان وقت أذكار الصباح',
-  }) async {
+  Future<bool> scheduleDaily({required int hour, required int minute}) async {
     if (!_initialized) return false;
     try {
       // Cancel any previous schedule first — rescheduling replaces.
@@ -113,10 +91,12 @@ class NotificationService {
         ),
       );
 
+      // ponytail: inexact window (system-defined, typically ≤15min skew);
+      // switch to exactAllowWhileIdle only if users report mistimed reminders.
       await _plugin.zonedSchedule(
         _reminderId,
-        title,
-        body,
+        'رفيق المسلم',
+        'حان وقت أذكار الصباح',
         scheduledDate,
         details,
         androidScheduleMode: AndroidScheduleMode.inexact,

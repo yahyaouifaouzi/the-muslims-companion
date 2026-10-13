@@ -16,24 +16,13 @@ class FakeNotificationService implements NotificationService {
   bool cancelled = false;
 
   @override
-  bool get initialized => true;
-
-  @override
   Future<bool> init() async => true;
 
   @override
   Future<bool> requestPermission() async => allowPermission;
 
   @override
-  Future<bool> areNotificationsEnabled() async => allowPermission;
-
-  @override
-  Future<bool> scheduleDaily({
-    required int hour,
-    required int minute,
-    String title = 'رفيق المسلم',
-    String body = 'حان وقت أذكار الصباح',
-  }) async {
+  Future<bool> scheduleDaily({required int hour, required int minute}) async {
     lastHour = hour;
     lastMinute = minute;
     cancelled = false;

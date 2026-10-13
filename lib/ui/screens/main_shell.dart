@@ -9,10 +9,9 @@ import 'settings_screen.dart';
 /// Shell for the three root screens (home, favorites, settings) driven by a
 /// bottom NavigationBar; [IndexedStack] keeps state across tab switches.
 class MainShell extends StatefulWidget {
-  const MainShell({super.key, this.notificationService});
+  const MainShell({super.key, required this.notificationService});
 
-  /// Injectable for tests; provided by the app root in production.
-  final NotificationService? notificationService;
+  final NotificationService notificationService;
 
   @override
   State<MainShell> createState() => _MainShellState();

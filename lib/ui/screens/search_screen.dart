@@ -56,6 +56,8 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final catalog = context.watch<ContentProvider>().catalog;
+    // ponytail: recompute-per-keystroke over allEntries (~25ms @5k entries);
+    // memoize normalized haystacks when content grows past ~20k or search lags.
     final entries = searchEntries(catalog?.allEntries ?? const [], _query);
 
     final Widget body;

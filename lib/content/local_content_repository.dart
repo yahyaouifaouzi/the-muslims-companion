@@ -59,6 +59,9 @@ class LocalContentRepository {
       // Release builds must never show unverified/placeholder religious text:
       // it is validated (dedup/category checks still run on every entry) but
       // excluded from the rendered catalog.
+      // ponytail: filter-at-load only; if a remote snapshot is all-unverified,
+      // release catalog can go empty — add a non-empty check in the refresh
+      // service when real hosts ship mixed content.
       _excludeUnverified = excludeUnverified ?? kReleaseMode;
 
   static const String _base = 'assets/data';

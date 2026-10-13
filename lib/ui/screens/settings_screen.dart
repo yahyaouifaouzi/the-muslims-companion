@@ -10,10 +10,9 @@ import '../../content/refresh/content_refresh_service.dart';
 /// Settings: content section with version info and manual refresh, plus the
 /// daily reminder section and a placeholder for font size (later milestone).
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key, this.notificationService});
+  const SettingsScreen({super.key, required this.notificationService});
 
-  /// Injectable for tests; provided by the app shell in production.
-  final NotificationService? notificationService;
+  final NotificationService notificationService;
 
   @override
   Widget build(BuildContext context) {
@@ -167,10 +166,13 @@ class _ContentCard extends StatelessWidget {
 }
 
 class _ReminderCard extends StatefulWidget {
-  const _ReminderCard({required this.reminder, this.notificationService});
+  const _ReminderCard({
+    required this.reminder,
+    required this.notificationService,
+  });
 
   final ReminderStore reminder;
-  final NotificationService? notificationService;
+  final NotificationService notificationService;
 
   @override
   State<_ReminderCard> createState() => _ReminderCardState();
@@ -186,11 +188,6 @@ class _ReminderCardState extends State<_ReminderCard> {
   Future<void> _onToggle(bool enabled) async {
     final reminder = widget.reminder;
     final service = widget.notificationService;
-    if (service == null) {
-      // No service (e.g. in tests) — just persist the preference.
-      await reminder.setEnabled(enabled);
-      return;
-    }
 
     if (enabled) {
       final permissionOk = await service.requestPermission();
@@ -225,9 +222,11 @@ class _ReminderCardState extends State<_ReminderCard> {
     await reminder.setTime(picked.hour, picked.minute);
 
     // Reschedule if the reminder is currently active.
-    final service = widget.notificationService;
-    if (reminder.enabled && service != null) {
-      await service.scheduleDaily(hour: reminder.hour, minute: reminder.minute);
+    if (reminder.enabled) {
+      await widget.notificationService.scheduleDaily(
+        hour: reminder.hour,
+        minute: reminder.minute,
+      );
     }
   }
 

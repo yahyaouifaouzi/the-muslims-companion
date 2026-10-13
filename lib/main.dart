@@ -120,7 +120,9 @@ class MuslimCompanionApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
         ],
         locale: const Locale('ar'),
-        home: MainShell(notificationService: notificationService),
+        home: MainShell(
+          notificationService: notificationService ?? NotificationService(),
+        ),
       ),
     );
   }
