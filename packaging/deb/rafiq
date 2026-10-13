@@ -1,0 +1,4 @@
+#!/bin/sh
+# Launcher for Rafiq. The Flutter engine resolves lib/ and data/ relative to
+# the executable, so running from /usr/lib/rafiq works as-is.
+exec /usr/lib/rafiq/the_muslims_companion "$@"

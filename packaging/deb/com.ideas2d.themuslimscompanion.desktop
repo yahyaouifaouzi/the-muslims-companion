@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Rafiq
+Name[ar]=رفيق المسلم
+Comment=Muslim companion — morning/evening adhkar, prayer counter, favorites
+Comment[ar]=رفيق المسلم — أذكار الصباح والمساء، عدادة الصلوات، المفضلة
+Exec=rafiq
+Icon=com.ideas2d.themuslimscompanion
+Terminal=false
+Type=Application
+Categories=Utility;
+StartupWMClass=rafiq

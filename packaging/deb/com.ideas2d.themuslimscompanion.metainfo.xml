@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.ideas2d.themuslimscompanion</id>
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Rafiq</name>
+  <name>رفيق المسلم</name>
+  <summary>Muslim companion — morning/evening adhkar, prayer counter, favorites</summary>
+  <description>
+    <p>
+      Rafiq (رفيق المسلم) is an offline Muslim companion app. It provides
+      morning and evening adhkar from bundled, authentic sources, a prayer
+      counter (tasbih), favorites, and search — all in Arabic with a clean
+      green/off-white interface.
+    </p>
+    <p>
+      Features:
+    </p>
+    <ul>
+      <li>Morning and evening adhkar with source attribution</li>
+      <li>Prayer counter (tasbih) with persistent state</li>
+      <li>Favorites and full-text search</li>
+      <li>Optional daily reminder (where supported)</li>
+      <li>Adjustable reading font size</li>
+      <li>Fully offline — no account, no analytics, no ads</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">com.ideas2d.themuslimscompanion.desktop</launchable>
+  <url type="homepage">https://github.com/ideas2d/TheMuslimsCompanion</url>
+  <developer id="com.ideas2d">
+    <name>ideas2d</name>
+  </developer>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="1.0.0" date="2026-10-13"/>
+  </releases>
+</component>
