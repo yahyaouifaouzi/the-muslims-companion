@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "the_muslims_companion" "\0"
+            VALUE "CompanyName", "com.ideas2d" "\0"
+            VALUE "FileDescription", "The Muslim's Companion" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "the_muslims_companion" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.ideas2d. All rights reserved." "\0"
             VALUE "OriginalFilename", "the_muslims_companion.exe" "\0"
-            VALUE "ProductName", "the_muslims_companion" "\0"
+            VALUE "ProductName", "Rafiq" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

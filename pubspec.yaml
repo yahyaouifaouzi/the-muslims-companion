@@ -1,7 +1,11 @@
+# Dart package identifier (internal; not user-facing). The user-facing app
+# identity is com.ideas2d.themuslimscompanion (Android applicationId, Linux
+# APPLICATION_ID, Windows publisher) with the Arabic display name
+# "رفيق المسلم" and the ASCII fallback name "Rafiq".
 name: the_muslims_companion
-description: "رفيق المسلم — The Muslim's Companion app.
-  Milestone 1 (foundation): Arabic Material 3 theme, dependencies, and asset setup.
-  Content (JSON) is bundled under assets/data/ and will be extended in later milestones."
+description: >-
+  Rafiq — The Muslim's Companion. Arabic-first daily companion for adhkar,
+  duas and hadiths. Offline-first, no accounts, no analytics, no ads.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
