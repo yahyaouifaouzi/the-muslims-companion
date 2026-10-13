@@ -70,8 +70,11 @@ jobs:
           name: rafiq-amd64-deb
           path: build/*.deb
 
+  # Windows is experimental: MSIX packaging is best-effort and must never
+  # block the release. If it fails, Android/Linux artifacts still publish.
   build-windows:
     runs-on: windows-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v7
 
@@ -90,9 +93,13 @@ jobs:
         with:
           name: rafiq-msix
           path: build/windows/x64/runner/Release/*.msix
+          if-no-files-found: ignore
 
   publish:
-    needs: [build-android, build-linux, build-windows]
+    # Publish as long as the Android build succeeded, even if Windows (or
+    # Linux) failed or was cancelled — only existing artifacts are attached.
+    needs: [build-android, build-linux]
+    if: ${{ !cancelled() && needs.build-android.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
