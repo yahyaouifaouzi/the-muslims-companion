@@ -1,7 +1,7 @@
 # Implementation Plan — رفيق المسلم (The Muslim's Companion)
 
-Status: **Re-inspected during Prompt 00 (2026-10-13); updated after Prompt 07.**
-Milestones 01–07 are implemented; checks are green. Next up: Prompt 08.
+Status: **Re-inspected during Prompt 00 (2026-10-13); updated after Prompt 08.**
+Milestones 01–08 are implemented; checks are green. Next up: Prompt 09.
 
 ## 1. Current environment
 
@@ -25,7 +25,11 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
   `theme/app_theme.dart` (green/off-white/beige).
 - `lib/content/` — typed models + `LocalContentRepository` with file allow-list
   (`kAllowedContentFiles`), cross-validation, typed `ContentException`,
-  injectable `JsonDocumentLoader` for tests.
+  injectable `JsonDocumentLoader` for tests. `refresh/` sub-package:
+  `ContentCache` (atomic single-file snapshot + shared_preferences metadata),
+  `RemoteContentClient` (HTTPS-only, timeout, size limit, path-traversal
+  rejection), `ContentRefreshService` (fetch→validate→activate with rollback
+  safety).
 - `lib/ui/` — `MainShell` (`IndexedStack`: Home / Favorites / Settings bottom
   nav), Categories, Category detail, dynamic category cards, shared
   loading/empty/error views, icon mapper.
@@ -33,11 +37,15 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
   registered in `pubspec.yaml`.
 - `docs/CONTENT_SCHEMA.md` — JSON contract (schemaVersion vs contentVersion,
   placeholder policy).
-- `test/` — 8 files, **76 tests, all passing**: model parsing/validation,
+- `docs/CONTENT_PUBLISHING.md` — how to host and publish a content release.
+- `test/` — 11 files, **102 tests, all passing**: model parsing/validation,
   repository fixtures (valid/missing/duplicate/malformed), shell/RTL/empty/
   error widget tests, reader font-bound/share-text tests, Arabic search
   normalization/matching, favorites persistence + stale-ID resolution,
-  counter increment/reset/persistence/completion, and real-asset smoke test.
+  counter increment/reset/persistence/completion, content cache atomicity,
+  remote client security constraints, refresh service (unchanged/success/
+  timeout/invalid-JSON/duplicate-IDs/bad-category-ref/partial-download/
+  rollback), and real-asset smoke test.
 - `README.md` — setup, run, and check commands.
 - `AGENTS.md` / `GEMINI.md` / `.claude/` / `opencode.json` — agent tooling
   (graft context graph) added by the `MCP` commit; `graft/` is local-only
@@ -54,7 +62,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 | 05 | Reader screen: font size, copy/share, verbatim Arabic | ✅ Done (new `lib/ui/screens/reader_screen.dart`) |
 | 06 | Search + Arabic normalization + persistent favorites | ✅ Done (`search_screen.dart`, `favorites_store.dart`; shared `EntryCard`) |
 | 07 | Adhkar repetition counter | ✅ Done (`counter_store.dart`, `counter_section.dart`; large tap target) |
-| 08 | Hybrid remote JSON updates + offline cache/rollback | ⬜ Not started (repo is local-only; `http`/`path_provider` not yet deps) |
+| 08 | Hybrid remote JSON updates + offline cache/rollback | ✅ Done (`content/refresh/`: cache, client, service; Settings refresh UI) |
 | 09 | Daily local notifications + settings | ⬜ Not started (no `flutter_local_notifications` dep) |
 | 10 | Accessibility & polish pass | ⬜ Not started |
 | 11 | Release readiness (identity, signing, checklist) | ⬜ Not started |
@@ -63,7 +71,7 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 
 - `flutter doctor` → No issues found ✓
 - `flutter analyze` → No issues found (exit 0) ✓
-- `flutter test` → 76/76 passed (exit 0) ✓
+- `flutter test` → 102/102 passed (exit 0) ✓
 
 ### Known gaps / housekeeping
 
@@ -72,8 +80,14 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
   (Prompt 11 scope).
 - `pubspec.yaml` description still says "Milestone 1 (foundation)" — stale
   wording, cosmetic.
-- `docs/IMPLEMENTATION_PLAN.md` milestones 08/09 mention docs
-  (`CONTENT_PUBLISHING.md`, `RELEASE_CHECKLIST.md`) that don't exist yet.
+- `docs/IMPLEMENTATION_PLAN.md` milestone 09 mentions a doc
+  (`RELEASE_CHECKLIST.md`) that doesn't exist yet.
+- `kContentBaseUrl` in `main.dart` is a placeholder
+  (`https://content.example.com/v1`) — must be replaced with the real content
+  host before release (see `docs/CONTENT_PUBLISHING.md`).
+- No cryptographic content integrity — relies on HTTPS + full validation
+  only. Signed content is a future enhancement, documented in
+  `CONTENT_PUBLISHING.md`.
 
 ## 3. Architecture rules (carried across all milestones)
 
@@ -94,8 +108,9 @@ A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 
 ## 4. Immediate next action
 
-Send **Prompt 08** (hybrid remote JSON updates + offline cache/rollback) from
-`CLAUDE_CODE_PROMPTS.md`. This is a high-risk data-integrity milestone —
-inspect `LocalContentRepository` and its tests before changing anything.
-New deps likely needed: `http`, `path_provider`. Preserve the green working
-tree and the 76 passing tests.
+Send **Prompt 09** (daily local notifications + settings) from
+`CLAUDE_CODE_PROMPTS.md`. New deps likely needed:
+`flutter_local_notifications`, `timezone`. Starting points: the Settings
+screen (content section exists; add reminder section), `CounterStore`/
+`FavoritesStore` patterns for persistence. Preserve the green working tree
+and the 102 passing tests.
