@@ -117,11 +117,14 @@ flutter:
 
 # Windows MSIX packaging config (used by the `msix` dev dependency).
 # Run `dart run msix:create` on Windows or in CI after `flutter build windows`.
-msix:
+# NOTE: the key MUST be `msix_config` (not `msix`) and the fields must use the
+# package's exact names (`identity_name`, `logo_path`) — otherwise msix reads an
+# empty config and exits with "could not find the Publisher value".
+msix_config:
   display_name: Rafiq
   publisher_display_name: ideas2d
-  identity: com.ideas2d.themuslimscompanion
+  identity_name: com.ideas2d.themuslimscompanion
   publisher: CN=ideas2d
-  logo: android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+  logo_path: android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
   languages: ar-sa
   # capabilities: internetClient  # not needed — app is fully offline
