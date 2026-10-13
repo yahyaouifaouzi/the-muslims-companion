@@ -113,6 +113,17 @@ class MuslimCompanionApp extends StatelessWidget {
         title: appTitle,
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light(),
+        // Cap the app width so wide desktop windows keep a readable,
+        // phone-like column instead of stretching cards edge-to-edge.
+        builder: (context, child) => ColoredBox(
+          color: AppTheme.offWhite,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 680),
+              child: child,
+            ),
+          ),
+        ),
         supportedLocales: const [Locale('ar')],
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
