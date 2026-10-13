@@ -1,74 +1,98 @@
 # Implementation Plan — رفيق المسلم (The Muslim's Companion)
 
-Status: **Updated after re-running Prompt 00.** A Flutter project now exists (default
-template, scaffolded 2026-10-13 10:16). No features implemented yet.
+Status: **Re-inspected during Prompt 00 (2026-10-13).** Milestones 01–04 are
+implemented and committed (`01`…`04`); checks are green. Next up: Prompt 05.
 
 ## 1. Current environment
 
 | Item | Status |
 |------|--------|
 | OS | Ubuntu 24.04.5 LTS (locale `fr_FR.UTF-8`) |
-| Flutter SDK | **3.47.7 stable** at `/home/ideasd/flutter` (added to PATH per-session; consider adding to `~/.bashrc`) |
-| Dart SDK | 3.13.5 (bundled with Flutter) |
+| Flutter SDK | **3.47.7 stable** at `$HOME/flutter` (not necessarily on a fresh shell's PATH) |
+| Dart SDK | 3.13.5 (bundled with Flutter); pubspec constraint `^3.13.5` |
 | Android toolchain | ✓ Android SDK 36.0.0 (`flutter doctor` passes) |
-| Java | `/usr/bin/java` ✓ |
-| `flutter doctor` | **No issues found** (2 devices available) |
-| Git | ✓ 2.55.0, repository initialized on branch `master` |
+| `flutter doctor` | **No issues found** (Chrome + Linux desktop also available) |
+| Git | branch `master`, working tree clean. History: `INIT` → `INIT Flutter` → `01` → `02` → `03` → `04` → `MCP` |
 
 ## 2. Current project status
 
-- Working directory: `/home/ideasd/ideas2d/TheMuslimsCompanion` — **is a Flutter project**.
-- Scaffold: fresh `flutter create` output (`INIT Flutter` commit `bfcd679` on top of an
-  earlier `INIT` commit). Working tree is clean.
-- Package name: `the_muslims_companion`, version `1.0.0+1`, SDK constraint `^3.13.5`.
-- `lib/`: only the **default counter demo** (`main.dart`, untouched template).
-- `test/`: single template widget test (`widget_test.dart`).
-- `docs/`: `IMPLEMENTATION_PLAN.md` only.
+A real app now exists (the earlier "nothing implemented" snapshot is obsolete):
 
-### Baseline checks (run this session)
-- `flutter --version` → Flutter 3.47.7 / Dart 3.13.5 ✓
-- `flutter doctor` → No issues found ✓
-- `flutter analyze` → No issues found (exit 0) ✓
-- `flutter test` → 1/1 passed (exit 0) ✓
+- `lib/main.dart` — app shell: `ar` locale, RTL, Material 3 theme, provider wiring.
+- `lib/app/` — `content_provider.dart` (loading/error/catalog states),
+  `theme/app_theme.dart` (green/off-white/beige).
+- `lib/content/` — typed models + `LocalContentRepository` with file allow-list
+  (`kAllowedContentFiles`), cross-validation, typed `ContentException`,
+  injectable `JsonDocumentLoader` for tests.
+- `lib/ui/` — `MainShell` (`IndexedStack`: Home / Favorites / Settings bottom
+  nav), Categories, Category detail, dynamic category cards, shared
+  loading/empty/error views, icon mapper.
+- `assets/data/` — manifest, categories, duas, hadiths, adhkar JSON,
+  registered in `pubspec.yaml`.
+- `docs/CONTENT_SCHEMA.md` — JSON contract (schemaVersion vs contentVersion,
+  placeholder policy).
+- `test/` — 4 files, **38 tests, all passing**: model parsing/validation,
+  repository fixtures (valid/missing/duplicate/malformed), shell/RTL/empty/
+  error widget tests, real-asset smoke test.
+- `README.md` — setup, run, and check commands.
+- `AGENTS.md` / `GEMINI.md` / `.claude/` / `opencode.json` — agent tooling
+  (graft context graph) added by the `MCP` commit; `graft/` is local-only
+  (gitignored, rebuild with `graft build`).
 
-### What is missing vs. the target app (mapped to prompts 01–11)
+### Milestone status (mapped to CLAUDE_CODE_PROMPTS.md)
 
 | Prompt | Milestone | Status |
 |--------|-----------|--------|
-| 01 | Foundation: deps (`provider`, `shared_preferences`, `share_plus`, `flutter_localizations`), Arabic locale + RTL, Material 3 green/white/beige theme, feature-oriented `lib/` structure, `assets/data/` in pubspec | ❌ Not started (default template) |
-| 02 | Content models + bundled JSON schemas (manifest, categories, duas, hadiths, adhkar), validations, `docs/CONTENT_SCHEMA.md` | ❌ Not started |
-| 03 | Local content repository (typed loading, validation, typed errors) | ❌ Not started |
-| 04 | App shell + home/categories/list screens, dynamic category cards, state handling | ❌ Not started |
-| 05 | Reader screen: font size, copy/share, verbatim Arabic handling | ❌ Not started |
-| 06 | Search + Arabic normalization + persistent favorites | ❌ Not started |
-| 07 | Adhkar repetition counter | ❌ Not started |
-| 08 | Hybrid remote JSON updates + offline cache with validation/rollback | ❌ Not started |
-| 09 | Daily local notifications + settings | ❌ Not started |
-| 10 | Accessibility & polish pass | ❌ Not started |
-| 11 | Release readiness (signing docs, release checklist) | ❌ Not started |
+| 01 | Foundation: deps, Arabic locale + RTL, theme, structure, assets | ✅ Done (commit `01`) |
+| 02 | Content models + bundled JSON + schema doc + tests | ✅ Done (commit `02`) |
+| 03 | Local content repository (allow-list, typed errors, tests) | ✅ Done (commit `03`) |
+| 04 | App shell, home/categories/detail, states, widget tests | ✅ Done (commit `04`) |
+| 05 | Reader screen: font size, copy/share, verbatim Arabic | ⬜ Not started |
+| 06 | Search + Arabic normalization + persistent favorites | ⬜ Not started (search is an entry-point stub; Favorites tab shows empty state) |
+| 07 | Adhkar repetition counter | ⬜ Not started |
+| 08 | Hybrid remote JSON updates + offline cache/rollback | ⬜ Not started (repo is local-only; `http`/`path_provider` not yet deps) |
+| 09 | Daily local notifications + settings | ⬜ Not started (no `flutter_local_notifications` dep) |
+| 10 | Accessibility & polish pass | ⬜ Not started |
+| 11 | Release readiness (identity, signing, checklist) | ⬜ Not started |
 
-### Additional gaps / housekeeping known now
-- `assets/data/` does not exist yet and no assets are registered in `pubspec.yaml`.
-- Default app title/description in `pubspec.yaml` and `main.dart` still say
-  "Flutter Demo / A new Flutter project" — will be replaced in Prompt 01.
-- Android applicationId and app label are Flutter defaults — review in Prompt 01/11.
-- Platform folders for iOS/macOS/Linux/Windows/web exist although the app is
-  Android-first; harmless, can stay.
+### Baseline checks (run this session)
+
+- `flutter doctor` → No issues found ✓
+- `flutter analyze` → No issues found (exit 0) ✓
+- `flutter test` → 38/38 passed (exit 0) ✓
+
+### Known gaps / housekeeping
+
+- Android identity still template values: `applicationId =
+  com.example.the_muslims_companion`, launcher label `the_muslims_companion`
+  (Prompt 11 scope).
+- `pubspec.yaml` description still says "Milestone 1 (foundation)" — stale
+  wording, cosmetic.
+- `shared_preferences` and `share_plus` are installed but unused in `lib/`
+  yet — reserved for Prompts 05/06.
+- `docs/IMPLEMENTATION_PLAN.md` milestones 08/09 mention docs
+  (`CONTENT_PUBLISHING.md`, `RELEASE_CHECKLIST.md`) that don't exist yet.
 
 ## 3. Architecture rules (carried across all milestones)
 
 - Flutter/Dart, Android first; Arabic-only UI, RTL; Material 3 deep green /
   off-white / beige.
 - Bundled JSON is the initial source of truth; remote updates + offline cache
-  come later (prompt 08).
+  come later (Prompt 08).
 - Features: categories with icons, search, favorites, copy/share, adhkar
   counter, daily notifications, adjustable font size.
 - No backend, database, login, analytics, ads, or Firebase in the MVP.
 - **Never invent** Quranic verses, hadiths, sources, authenticity grades, or
   prescribed repetition counts. Unverified content is clearly labelled as
   placeholders and excluded from production until verified.
+- Layout must stay Directionality-aware (`EdgeInsetsDirectional`,
+  `AlignmentDirectional`, start/end) — never hardcode left/right.
+- Malformed content raises typed `ContentException`; never silently render an
+  empty list.
 
 ## 4. Immediate next action
 
-Ready for **Prompt 01** (project foundation). Nothing in this document was
-implemented yet — no features, no dependencies beyond the template.
+Send **Prompt 05** (reader screen, text settings, copy/share) from
+`CLAUDE_CODE_PROMPTS.md`. Existing `share_plus` dep and the reader-less
+`category_detail_screen.dart` are the starting points. Preserve the green
+working tree and the 38 passing tests.
