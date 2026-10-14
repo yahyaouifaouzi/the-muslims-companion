@@ -10,7 +10,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('رفيق المسلم'), findsOneWidget);
-    expect(find.text('أذكار الصباح'), findsOneWidget);
     expect(find.text('ابحث في المحتوى'), findsOneWidget);
+
+    // The feed leads with curated entries; the category list sits below.
+    await tester.scrollUntilVisible(find.text('أذكار الصباح'), 300);
+    await tester.pumpAndSettle();
+    expect(find.text('أذكار الصباح'), findsOneWidget);
   });
 }

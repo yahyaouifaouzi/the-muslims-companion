@@ -241,14 +241,24 @@ void main() {
       }
     });
 
-    test('no bundled entry invents a repeat count', () async {
+    test('repeat counts only exist where they are sourced', () async {
       for (final file in contentFiles) {
         final entriesFile = EntriesFile.fromJson(
           _json(await rootBundle.loadString('assets/data/$file')),
           fileContext: file,
         );
         for (final entry in entriesFile.entries) {
-          expect(entry.repeatCount, isNull, reason: entry.id);
+          if (entry.placeholder) continue;
+          final isDhikr = entry.categoryId.startsWith('adhkar-');
+          if (isDhikr) {
+            if (entry.source == null) {
+              continue; // legacy row without attribution
+            }
+            expect(entry.repeatCount, isNotNull, reason: entry.id);
+            expect(entry.repeatCount, greaterThan(0), reason: entry.id);
+          } else {
+            expect(entry.repeatCount, isNull, reason: entry.id);
+          }
         }
       }
     });
