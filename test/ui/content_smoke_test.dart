@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/widgets.dart' show Scrollable;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_muslims_companion/main.dart';
@@ -27,7 +28,12 @@ void main() {
     await tester.pumpWidget(const MuslimCompanionApp());
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(find.text('أذكار الصباح'), 300);
+    // The home screen has two scrollables (featured strip + page list).
+    await tester.scrollUntilVisible(
+      find.text('أذكار الصباح'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('أذكار الصباح'));
     await tester.pumpAndSettle();
