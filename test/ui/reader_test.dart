@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:the_muslims_companion/app/counter_store.dart';
 import 'package:the_muslims_companion/app/favorites_store.dart';
+import 'package:the_muslims_companion/app/last_read_store.dart';
 import 'package:the_muslims_companion/content/local_content_repository.dart';
 import 'package:the_muslims_companion/content/models/content_entry.dart';
 import 'package:the_muslims_companion/content/models/content_source.dart';
@@ -35,6 +36,7 @@ Widget _readerWidget(ContentEntry entry) => MultiProvider(
   providers: [
     ChangeNotifierProvider(create: (_) => FavoritesStore()),
     ChangeNotifierProvider(create: (_) => CounterStore()),
+    ChangeNotifierProvider(create: (_) => LastReadStore()),
   ],
   child: MaterialApp(home: ReaderScreen(entry: entry)),
 );

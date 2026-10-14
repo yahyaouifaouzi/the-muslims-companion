@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_muslims_companion/app/counter_store.dart';
 import 'package:the_muslims_companion/app/favorites_store.dart';
+import 'package:the_muslims_companion/app/last_read_store.dart';
 import 'package:the_muslims_companion/content/models/content_entry.dart';
 import 'package:the_muslims_companion/ui/screens/reader_screen.dart';
 import 'package:the_muslims_companion/ui/widgets/counter_section.dart';
@@ -22,10 +23,18 @@ ContentEntry _entry({int? repeatCount}) => ContentEntry(
 Widget _readerWidget(ContentEntry entry, CounterStore store) => MultiProvider(
   providers: [
     ChangeNotifierProvider(create: (_) => FavoritesStore()),
+    ChangeNotifierProvider(create: (_) => LastReadStore()),
     ChangeNotifierProvider.value(value: store),
   ],
   child: MaterialApp(home: ReaderScreen(entry: entry)),
 );
+
+String _today() {
+  final now = DateTime.now();
+  return '${now.year.toString().padLeft(4, '0')}-'
+      '${now.month.toString().padLeft(2, '0')}-'
+      '${now.day.toString().padLeft(2, '0')}';
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -72,6 +81,8 @@ void main() {
         first.setUserTarget('a', 5);
         first.increment('a', target: 5);
         first.increment('a', target: 5);
+        // Flush the unawaited persistence before re-reading.
+        await Future<void>.delayed(Duration.zero);
 
         final second = CounterStore();
         await second.load();
@@ -103,6 +114,28 @@ void main() {
       await store.load();
       expect(store.countFor('a'), 0);
       expect(store.hasUserTarget('a'), isFalse);
+    });
+
+    test('counts from a previous day are dropped; targets survive', () async {
+      SharedPreferences.setMockInitialValues({
+        'counter_counts': '{"a": 7}',
+        'counter_targets': '{"a": 10}',
+        'counter_day': '2000-01-01',
+      });
+      final store = CounterStore();
+      await store.load();
+      expect(store.countFor('a'), 0);
+      expect(store.userTargetFor('a'), 10);
+    });
+
+    test('counts from today restore after restart', () async {
+      SharedPreferences.setMockInitialValues({
+        'counter_counts': '{"a": 3}',
+        'counter_day': _today(),
+      });
+      final store = CounterStore();
+      await store.load();
+      expect(store.countFor('a'), 3);
     });
   });
 
