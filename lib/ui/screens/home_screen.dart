@@ -160,10 +160,14 @@ class _GreetingHeader extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.9),
                     ),
                     const SizedBox(width: AppTheme.space2),
-                    Text(
-                      hijri,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.9),
+                    Expanded(
+                      child: Text(
+                        hijri,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
                       ),
                     ),
                   ],
@@ -202,12 +206,6 @@ class _SearchEntryPoint extends StatelessWidget {
                 color: theme.palette.muted,
               ),
             ),
-          ),
-          Icon(
-            Directionality.of(context) == TextDirection.rtl
-                ? Icons.chevron_left
-                : Icons.chevron_right,
-            color: theme.palette.muted,
           ),
         ],
       ),
