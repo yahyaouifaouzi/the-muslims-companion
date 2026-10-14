@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 
 import '../../app/content_provider.dart';
 import '../../app/hijri_date.dart';
+import '../../app/last_read_store.dart';
 import '../../app/theme/app_theme.dart';
 import '../../content/local_content_repository.dart' show ContentCatalog;
+import '../../content/models/content_entry.dart';
 import '../widgets/category_card.dart';
 import '../widgets/featured_section.dart';
 import '../widgets/ornaments.dart';
@@ -64,6 +66,7 @@ class _HomeBody extends StatelessWidget {
         const SizedBox(height: AppTheme.space3),
         const _SearchEntryPoint(),
         const SizedBox(height: AppTheme.space3),
+        _ContinueReading(catalog: catalog),
         FeaturedSection(
           entries: catalog.allEntries,
           maxItems: 8,
@@ -182,6 +185,66 @@ class _GreetingHeader extends StatelessWidget {
 }
 
 /// Search entry point: opens the full in-memory search screen.
+/// "Continue where you left off" card: the last opened entry, or nothing
+/// when it was dismissed or no longer exists in the catalog.
+class _ContinueReading extends StatelessWidget {
+  const _ContinueReading({required this.catalog});
+
+  final ContentCatalog catalog;
+
+  @override
+  Widget build(BuildContext context) {
+    final lastRead = context.watch<LastReadStore>();
+    final String? id = lastRead.entryId;
+    if (id == null) return const SizedBox.shrink();
+    ContentEntry? match;
+    for (final entry in catalog.allEntries) {
+      if (entry.id == id) {
+        match = entry;
+        break;
+      }
+    }
+    final entry = match;
+    if (entry == null) return const SizedBox.shrink();
+
+    final ThemeData theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(bottom: AppTheme.space3),
+      child: AppCard(
+        onTap: () =>
+            Navigator.of(context).push(ReaderScreen.route(entry: entry)),
+        child: Row(
+          children: <Widget>[
+            Icon(Icons.history, color: theme.palette.goldInk),
+            const SizedBox(width: AppTheme.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text('تابع من حيث توقفت', style: theme.textTheme.titleSmall),
+                  Text(
+                    entry.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.palette.muted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close),
+              tooltip: 'إخفاء',
+              onPressed: () => context.read<LastReadStore>().clear(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _SearchEntryPoint extends StatelessWidget {
   const _SearchEntryPoint();
 

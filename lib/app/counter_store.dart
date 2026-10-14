@@ -16,12 +16,34 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CounterStore extends ChangeNotifier {
   static const String _countsKey = 'counter_counts';
   static const String _targetsKey = 'counter_targets';
+  static const String _dayKey = 'counter_day';
 
   Map<String, int> _counts = <String, int>{};
   Map<String, int> _targets = <String, int>{};
+  String _day = _today();
 
-  /// Current progress for [entryId]; 0 when never counted.
-  int countFor(String entryId) => _counts[entryId] ?? 0;
+  /// Local calendar day (`yyyy-MM-dd`) the counts belong to. Counts are
+  /// daily progress: they clear automatically when the day rolls over,
+  /// while user-defined targets persist.
+  static String _today() {
+    final now = DateTime.now();
+    return '${now.year.toString().padLeft(4, '0')}-'
+        '${now.month.toString().padLeft(2, '0')}-'
+        '${now.day.toString().padLeft(2, '0')}';
+  }
+
+  bool get _stale => _day != _today();
+
+  void _rollDayIfNeeded() {
+    if (!_stale) return;
+    _counts = <String, int>{};
+    _day = _today();
+    unawaited(_persistCounts());
+  }
+
+  /// Current progress for [entryId]; 0 when never counted or when the
+  /// stored counts belong to a previous day.
+  int countFor(String entryId) => _stale ? 0 : (_counts[entryId] ?? 0);
 
   /// User-defined target for [entryId], or null when none was set.
   int? userTargetFor(String entryId) => _targets[entryId];
@@ -30,8 +52,10 @@ class CounterStore extends ChangeNotifier {
   bool hasUserTarget(String entryId) => _targets.containsKey(entryId);
 
   /// Increments the count, capped at [target] when a positive target is
-  /// given. Never produces a negative count.
+  /// given. Never produces a negative count. Rolls the day first so a
+  /// session open past midnight starts from zero.
   void increment(String entryId, {int? target}) {
+    _rollDayIfNeeded();
     final current = countFor(entryId);
     if (target != null && target > 0 && current >= target) return;
     _counts[entryId] = current + 1;
@@ -41,6 +65,7 @@ class CounterStore extends ChangeNotifier {
 
   /// Resets the count for [entryId] back to 0 (removes the stored entry).
   void reset(String entryId) {
+    _rollDayIfNeeded();
     if (!_counts.containsKey(entryId)) return;
     _counts.remove(entryId);
     notifyListeners();
@@ -63,13 +88,22 @@ class CounterStore extends ChangeNotifier {
     unawaited(_persistTargets());
   }
 
-  /// Restores persisted counts and user targets. Failures leave the store
-  /// empty in-memory instead of breaking the app.
+  /// Restores persisted counts and user targets. A stored day other than
+  /// today means the counts expired: they are dropped (targets survive).
+  /// Failures leave the store empty in-memory instead of breaking the app.
   Future<void> load() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      _counts = _decodeIntMap(prefs.getString(_countsKey));
+      final today = _today();
+      final storedDay = prefs.getString(_dayKey);
       _targets = _decodeIntMap(prefs.getString(_targetsKey));
+      if (storedDay == today) {
+        _counts = _decodeIntMap(prefs.getString(_countsKey));
+      } else {
+        _counts = <String, int>{};
+      }
+      _day = today;
+      if (storedDay != today) unawaited(_persistCounts());
     } catch (_) {
       // Best-effort restore only.
     }
@@ -94,6 +128,7 @@ class CounterStore extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_countsKey, jsonEncode(_counts));
+      await prefs.setString(_dayKey, _day);
     } catch (_) {
       // Keep the in-memory state even if persistence is unavailable.
     }

@@ -9,6 +9,7 @@ import 'app/appearance_store.dart';
 import 'app/content_provider.dart';
 import 'app/counter_store.dart';
 import 'app/favorites_store.dart';
+import 'app/last_read_store.dart';
 import 'app/notification_service.dart';
 import 'app/reminder_store.dart';
 import 'app/theme/app_theme.dart';
@@ -108,7 +109,8 @@ class MuslimCompanionApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => (counterStore ?? CounterStore())..load(),
         ),
-        ChangeNotifierProvider(create: (_) => ReminderStore()),
+        ChangeNotifierProvider(create: (_) => LastReadStore()..load()),
+        ChangeNotifierProvider(create: (_) => ReminderStore()..load()),
         ChangeNotifierProvider(create: (_) => AppearanceStore()..load()),
       ],
       // Read below the providers (the widget's own context sits above them).

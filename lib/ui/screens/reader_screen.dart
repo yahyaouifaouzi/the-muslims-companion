@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../app/favorites_store.dart';
+import '../../app/last_read_store.dart';
 import '../../app/theme/app_theme.dart';
 import '../../content/models/content_entry.dart';
 import '../widgets/counter_section.dart';
@@ -70,6 +71,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
   void initState() {
     super.initState();
     _restoreFontSize();
+    // Remember for the home "continue" card. Deferred a frame so the
+    // store's notifyListeners never fires during the first build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<LastReadStore>().record(_entry.id);
+    });
   }
 
   /// Restores the last chosen size; a missing or unreadable value keeps the
