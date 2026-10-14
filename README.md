@@ -12,7 +12,7 @@
 
 <img src="https://img.shields.io/badge/version-1.0.0-2E6B34" alt="Version 1.0.0">
 <img src="https://img.shields.io/badge/Flutter-3.47%2B-02569B" alt="Flutter 3.47+">
-<img src="https://img.shields.io/badge/platform-Android-3DDC84" alt="Platform Android">
+<img src="https://img.shields.io/badge/platform-Android%20%7C%20Linux%20%7C%20Windows-3DDC84" alt="Platforms Android, Linux, Windows">
 <img src="https://img.shields.io/badge/license-MIT-blue" alt="License MIT">
 <img src="https://img.shields.io/badge/status-active-brightgreen" alt="Status active">
 <img src="https://img.shields.io/github/last-commit/yahyaouifaouzi/the-muslims-companion" alt="Last commit">
@@ -37,8 +37,7 @@ but still point at a placeholder host (see [Project Status](#project-status)).
 
 ## Screenshots
 
-> The app currently ships a single light theme (`AppTheme.light()`) — there is no
-> dark mode yet, so no dark-mode screenshot is shown.
+> Light and dark themes are supported (system default, switchable in Settings).
 
 <table>
   <tr>
@@ -86,6 +85,7 @@ Everything below is implemented and covered by tests:
 - [x] **Adjustable font size** — step up/down while reading, clamped to sane limits
 - [x] **Optional daily reminders** — scheduled locally (Android & Windows;
       the Linux plugin lacks scheduling, so the card is hidden there)
+- [x] **Light & dark theme** — follows the system by default, switchable in Settings
 
 ---
 
@@ -184,7 +184,9 @@ lib/
   ui/screens/          # home, categories, reader, search, favorites, settings
   ui/widgets/          # cards, counter section, state views
 assets/data/           # bundled JSON content
-assets/fonts/          # bundled Noto Naskh Arabic (OFL)
+assets/fonts/          # bundled Tajawal, Amiri, Noto Naskh Arabic (OFL)
+packaging/deb/         # Debian build · snap/ · flatpak/ · MSIX config in pubspec
+.github/workflows/     # CI (analyze, test, Linux build) + release (AAB, deb, MSIX)
 docs/                  # plan, schema, publishing, release checklist
 ```
 
