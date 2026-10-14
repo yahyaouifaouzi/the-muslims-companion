@@ -11,10 +11,15 @@ import 'shell_test.dart' show fixtureLoader;
 /// Controllable stand-in for the platform notification service.
 class FakeNotificationService implements NotificationService {
   bool allowPermission = true;
+  bool systemNotificationsDisabled = false;
+  bool schedulingSupported = true;
   int? lastHour;
   int? lastMinute;
+  ReminderSlot? lastSlot;
   bool cancelled = false;
-  bool schedulingSupported = true;
+
+  @override
+  void Function(ReminderSlot slot)? onOpenAdhkar;
 
   @override
   bool get supportsScheduling => schedulingSupported;
@@ -26,7 +31,15 @@ class FakeNotificationService implements NotificationService {
   Future<bool> requestPermission() async => allowPermission;
 
   @override
-  Future<bool> scheduleDaily({required int hour, required int minute}) async {
+  Future<bool> areNotificationsEnabled() async => !systemNotificationsDisabled;
+
+  @override
+  Future<bool> scheduleDaily({
+    required ReminderSlot slot,
+    required int hour,
+    required int minute,
+  }) async {
+    lastSlot = slot;
     lastHour = hour;
     lastMinute = minute;
     cancelled = false;
@@ -34,11 +47,17 @@ class FakeNotificationService implements NotificationService {
   }
 
   @override
-  Future<void> cancel() async {
-    cancelled = true;
-    lastHour = null;
-    lastMinute = null;
+  Future<void> cancelSlot(ReminderSlot slot) async {
+    if (lastSlot == slot) {
+      cancelled = true;
+      lastHour = null;
+      lastMinute = null;
+      lastSlot = null;
+    }
   }
+
+  @override
+  Future<void> rescheduleEnabled(ReminderStore store) async {}
 }
 
 void main() {
@@ -59,15 +78,18 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('الإعدادات'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byType(Switch));
+    await tester.ensureVisible(find.byType(Switch).first);
     await tester.pumpAndSettle();
   }
 
-  testWidgets('reminder toggle is off by default', (tester) async {
+  testWidgets('both reminder toggles are off by default', (tester) async {
     await openSettings(tester, FakeNotificationService());
-    expect(find.text('تذكير يومي'), findsOneWidget);
-    expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
-    expect(find.text('وقت التذكير'), findsNothing);
+    expect(find.text('تذكير أذكار الصباح'), findsOneWidget);
+    expect(find.text('تذكير أذكار المساء'), findsOneWidget);
+    final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
+    expect(switches, hasLength(2));
+    expect(switches.every((s) => !s.value), isTrue);
+    expect(find.textContaining('وقت تذكير'), findsNothing);
   });
 
   testWidgets('unsupported platform hides the reminder card', (tester) async {
@@ -95,49 +117,87 @@ void main() {
     final fake = FakeNotificationService()..allowPermission = false;
     await openSettings(tester, fake);
 
-    await tester.tap(find.byType(Switch));
+    await tester.tap(find.byType(Switch).first);
     await tester.pumpAndSettle();
 
-    expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
+    final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
+    expect(switches.every((s) => !s.value), isTrue);
     expect(find.textContaining('تم رفض إذن الإشعارات'), findsOneWidget);
     expect(fake.lastHour, isNull); // never scheduled
     final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getBool('reminder_enabled'), isNot(true));
+    expect(prefs.getBool('reminder_morning_enabled'), isNot(true));
   });
 
-  testWidgets('granting permission schedules the default 07:00 reminder', (
+  testWidgets('notifications disabled at OS level shows guidance', (
+    tester,
+  ) async {
+    final fake = FakeNotificationService()
+      ..allowPermission = false
+      ..systemNotificationsDisabled = true;
+    await openSettings(tester, fake);
+
+    await tester.tap(find.byType(Switch).first);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('الإشعارات معطلة'), findsOneWidget);
+    expect(fake.lastHour, isNull);
+  });
+
+  testWidgets('granting permission schedules the morning 07:00 reminder', (
     tester,
   ) async {
     final fake = FakeNotificationService();
     await openSettings(tester, fake);
 
-    await tester.tap(find.byType(Switch));
+    await tester.tap(find.byType(Switch).first);
     await tester.pumpAndSettle();
 
-    expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
-    expect(fake.lastHour, ReminderStore.defaultHour);
-    expect(fake.lastMinute, ReminderStore.defaultMinute);
-    expect(find.text('وقت التذكير'), findsOneWidget);
+    expect(fake.lastSlot, ReminderSlot.morning);
+    expect(fake.lastHour, ReminderStore.defaultTimes[ReminderSlot.morning]?.$1);
+    expect(
+      fake.lastMinute,
+      ReminderStore.defaultTimes[ReminderSlot.morning]?.$2,
+    );
+    expect(find.text('وقت تذكير أذكار الصباح'), findsOneWidget);
     expect(find.text('07:00'), findsOneWidget);
     final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getBool('reminder_enabled'), isTrue);
+    expect(prefs.getBool('reminder_morning_enabled'), isTrue);
+  });
+
+  testWidgets('evening toggle is independent of the morning one', (
+    tester,
+  ) async {
+    final fake = FakeNotificationService();
+    await openSettings(tester, fake);
+
+    await tester.tap(find.byType(Switch).last); // evening
+    await tester.pumpAndSettle();
+
+    expect(fake.lastSlot, ReminderSlot.evening);
+    expect(fake.lastHour, 18);
+    expect(find.text('07:00'), findsNothing); // morning still off
+    expect(find.text('18:00'), findsOneWidget);
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getBool('reminder_morning_enabled'), isNot(true));
+    expect(prefs.getBool('reminder_evening_enabled'), isTrue);
   });
 
   testWidgets('turning the reminder off cancels the schedule', (tester) async {
     final fake = FakeNotificationService();
     await openSettings(tester, fake);
 
-    await tester.tap(find.byType(Switch));
+    await tester.tap(find.byType(Switch).first);
     await tester.pumpAndSettle();
     expect(fake.cancelled, isFalse);
 
-    await tester.tap(find.byType(Switch));
+    await tester.tap(find.byType(Switch).first);
     await tester.pumpAndSettle();
 
     expect(fake.cancelled, isTrue);
-    expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
-    expect(find.text('وقت التذكير'), findsNothing);
+    final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
+    expect(switches.every((s) => !s.value), isTrue);
+    expect(find.textContaining('وقت تذكير'), findsNothing);
     final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getBool('reminder_enabled'), isFalse);
+    expect(prefs.getBool('reminder_morning_enabled'), isFalse);
   });
 }

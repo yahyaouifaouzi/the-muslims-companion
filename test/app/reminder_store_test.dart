@@ -32,68 +32,82 @@ void main() {
   });
 
   group('ReminderStore', () {
-    test('defaults to disabled at 07:00', () async {
+    test('defaults to disabled at 07:00 morning and 18:00 evening', () async {
       SharedPreferences.setMockInitialValues({});
       final store = ReminderStore();
-      await store.load();
-      expect(store.enabled, isFalse);
-      expect(store.hour, ReminderStore.defaultHour);
-      expect(store.minute, ReminderStore.defaultMinute);
-      expect(store.timeLabel, '07:00');
+      await store.loaded;
+      expect(store.enabledFor(ReminderSlot.morning), isFalse);
+      expect(store.timeLabel(ReminderSlot.morning), '07:00');
+      expect(store.enabledFor(ReminderSlot.evening), isFalse);
+      expect(store.timeLabel(ReminderSlot.evening), '18:00');
     });
 
     test('setEnabled and setTime persist across instances', () async {
       SharedPreferences.setMockInitialValues({});
       final first = ReminderStore();
-      await first.load();
-      await first.setEnabled(true);
-      await first.setTime(21, 45);
+      await first.loaded;
+      await first.setEnabled(ReminderSlot.evening, true);
+      await first.setTime(ReminderSlot.evening, 21, 45);
 
       final second = ReminderStore();
-      await second.load();
-      expect(second.enabled, isTrue);
-      expect(second.hour, 21);
-      expect(second.minute, 45);
-      expect(second.timeLabel, '21:45');
+      await second.loaded;
+      expect(second.enabledFor(ReminderSlot.evening), isTrue);
+      expect(second.timeLabel(ReminderSlot.evening), '21:45');
+      // Morning slot untouched.
+      expect(second.enabledFor(ReminderSlot.morning), isFalse);
+      expect(second.timeLabel(ReminderSlot.morning), '07:00');
+    });
+
+    test('legacy single-reminder keys migrate to the morning slot', () async {
+      SharedPreferences.setMockInitialValues({
+        'reminder_enabled': true,
+        'reminder_hour': 6,
+        'reminder_minute': 30,
+      });
+      final store = ReminderStore();
+      await store.loaded;
+      expect(store.enabledFor(ReminderSlot.morning), isTrue);
+      expect(store.timeLabel(ReminderSlot.morning), '06:30');
+      expect(store.enabledFor(ReminderSlot.evening), isFalse);
     });
 
     test('timeLabel zero-pads single digits', () async {
       SharedPreferences.setMockInitialValues({});
       final store = ReminderStore();
-      await store.load();
-      await store.setTime(7, 5);
-      expect(store.timeLabel, '07:05');
+      await store.loaded;
+      await store.setTime(ReminderSlot.morning, 7, 5);
+      expect(store.timeLabel(ReminderSlot.morning), '07:05');
     });
 
     test('clamps out-of-range time values', () async {
       SharedPreferences.setMockInitialValues({});
       final store = ReminderStore();
-      await store.load();
-      await store.setTime(25, -10);
-      expect(store.hour, 23);
-      expect(store.minute, 0);
+      await store.loaded;
+      await store.setTime(ReminderSlot.morning, 25, -10);
+      expect(store.hourFor(ReminderSlot.morning), 23);
+      expect(store.minuteFor(ReminderSlot.morning), 0);
     });
 
     test('load resets invalid persisted values to defaults', () async {
       SharedPreferences.setMockInitialValues({
-        'reminder_enabled': true,
-        'reminder_hour': 99,
-        'reminder_minute': 99,
+        'reminder_morning_enabled': true,
+        'reminder_morning_hour': 99,
+        'reminder_morning_minute': 99,
       });
       final store = ReminderStore();
-      await store.load();
-      expect(store.enabled, isTrue);
-      expect(store.hour, ReminderStore.defaultHour);
-      expect(store.minute, ReminderStore.defaultMinute);
+      await store.loaded;
+      expect(store.enabledFor(ReminderSlot.morning), isTrue);
+      expect(store.hourFor(ReminderSlot.morning), 7);
+      expect(store.minuteFor(ReminderSlot.morning), 0);
     });
 
     test('notifies listeners on change', () async {
       SharedPreferences.setMockInitialValues({});
       final store = ReminderStore();
-      await store.load();
+      await store.loaded;
       var notified = false;
       store.addListener(() => notified = true);
-      await store.setEnabled(true);
+      await store.setEnabled(ReminderSlot.morning, true);
       expect(notified, isTrue);
     });
   });
