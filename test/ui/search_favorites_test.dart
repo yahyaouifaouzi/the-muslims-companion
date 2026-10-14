@@ -37,6 +37,7 @@ void main() {
     await tester.tap(find.text('ابحث في المحتوى'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'سبحان');
+    await tester.pump(const Duration(milliseconds: 300)); // search debounce
     await tester.pumpAndSettle();
 
     expect(find.text('لا توجد نتائج'), findsNothing);
@@ -56,6 +57,7 @@ void main() {
     await tester.tap(find.text('ابحث في المحتوى'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'كلمة غير موجودة');
+    await tester.pump(const Duration(milliseconds: 300)); // search debounce
     await tester.pumpAndSettle();
 
     expect(find.text('لا توجد نتائج'), findsOneWidget);

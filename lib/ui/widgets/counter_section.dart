@@ -140,10 +140,12 @@ class CounterSection extends StatelessWidget {
                                 shape: BoxShape.circle,
                                 color: palette.gold,
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.check,
                                 size: 20,
-                                color: Colors.white,
+                                // Dark emerald on gold: AA contrast for
+                                // icons in both light and dark themes.
+                                color: palette.emeraldDeep,
                               ),
                             ),
                           ),

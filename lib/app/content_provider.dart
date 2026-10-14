@@ -6,6 +6,7 @@ import '../content/content_exception.dart';
 import '../content/local_content_repository.dart';
 import '../content/refresh/content_cache.dart';
 import '../content/refresh/content_refresh_service.dart';
+import '../content/search_index.dart';
 
 /// Holds the loaded content snapshot for the UI, with explicit
 /// loading/error/success states. Widgets observe this via `provider`.
@@ -26,6 +27,10 @@ class ContentProvider extends ChangeNotifier {
   final ContentRefreshService? _refreshService;
 
   ContentCatalog? catalog;
+
+  /// Precomputed search index over the current catalog; rebuilt on every
+  /// successful load. Null until the first load completes.
+  SearchIndex? searchIndex;
 
   /// Arabic UI message for the failure state; null while fine.
   String? errorMessage;
@@ -58,6 +63,16 @@ class ContentProvider extends ChangeNotifier {
     notifyListeners();
     try {
       catalog = await _loadCatalog();
+      final loaded = catalog;
+      searchIndex = loaded == null
+          ? null
+          : SearchIndex(
+              loaded.allEntries,
+              categoryNames: <String, String>{
+                for (final category in loaded.categories)
+                  category.id: category.title,
+              },
+            );
       final cache = _cache;
       if (cache != null) {
         final activeVersion = await cache.getActiveContentVersion();

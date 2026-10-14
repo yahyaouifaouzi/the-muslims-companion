@@ -1,40 +1,22 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/content_provider.dart';
 import '../../app/theme/app_theme.dart';
-import '../../content/models/content_entry.dart';
+import '../../content/search_index.dart';
 import '../widgets/entry_card.dart';
 import '../widgets/ornaments.dart';
 import '../widgets/state_views.dart';
 import 'reader_screen.dart';
 
-/// Lower-effort match form: strips tashkeel (U+064B–U+065F, U+0670) and
-/// tatweel, unifies common alef variants to bare alef. Does not mutate the
-/// input; stored and displayed text is never rewritten.
-String normalizeArabic(String input) {
-  return input
-      .replaceAll(RegExp(r'[\u064B-\u065F\u0670\u0640]'), '')
-      .replaceAll(RegExp(r'[\u0623\u0625\u0622\u0671]'), 'ا');
-}
-
-/// Filters [entries] whose title, body, or tags contain [query] after Arabic
-/// normalization. An empty/blank query returns an empty list (the UI shows
-/// its prompt state instead).
-List<ContentEntry> searchEntries(List<ContentEntry> entries, String query) {
-  final normalizedQuery = normalizeArabic(query).trim().toLowerCase();
-  if (normalizedQuery.isEmpty) return const <ContentEntry>[];
-  return entries.where((entry) {
-    bool matches(String value) =>
-        normalizeArabic(value).toLowerCase().contains(normalizedQuery);
-    return matches(entry.title) ||
-        matches(entry.text) ||
-        entry.tags.any(matches);
-  }).toList();
-}
+export '../../content/search_index.dart'
+    show SearchHit, SearchIndex, normalizeArabic, searchEntries;
 
 /// Full-content in-memory search over the current snapshot. No network, no
-/// per-keystroke requests.
+/// per-keystroke requests; the index is precomputed at load and queries are
+/// debounced.
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
@@ -48,19 +30,30 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
   String _query = '';
+  Timer? _debounce;
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
+  void _onChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 250), () {
+      if (!mounted) return;
+      setState(() => _query = value);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final catalog = context.watch<ContentProvider>().catalog;
-    // ponytail: recompute-per-keystroke over allEntries (~25ms @5k entries);
-    // memoize normalized haystacks when content grows past ~20k or search lags.
-    final entries = searchEntries(catalog?.allEntries ?? const [], _query);
+    final provider = context.watch<ContentProvider>();
+    final catalog = provider.catalog;
+    final List<SearchHit> hits = catalog == null || _query.trim().isEmpty
+        ? const <SearchHit>[]
+        : provider.searchIndex?.search(_query) ?? const <SearchHit>[];
     final Color barForeground =
         Theme.of(context).appBarTheme.foregroundColor ?? Colors.white;
 
@@ -70,10 +63,10 @@ class _SearchScreenState extends State<SearchScreen> {
     } else if (_query.trim().isEmpty) {
       body = const EmptyView(
         message: 'ابحث في كل المحتوى',
-        hint: 'اكتب كلمة من العنوان أو النص أو الوسوم',
+        hint: 'اكتب كلمة من العنوان أو النص أو المصدر أو الوسوم',
         icon: Icons.search,
       );
-    } else if (entries.isEmpty) {
+    } else if (hits.isEmpty) {
       body = const EmptyView(
         message: 'لا توجد نتائج',
         hint: 'جرّب كلمات أخرى أو تحقق من الإملاء',
@@ -82,13 +75,16 @@ class _SearchScreenState extends State<SearchScreen> {
     } else {
       body = ListView.builder(
         padding: const EdgeInsetsDirectional.all(AppTheme.space4),
-        itemCount: entries.length,
+        itemCount: hits.length,
         itemBuilder: (context, index) {
-          final entry = entries[index];
+          final SearchHit hit = hits[index];
           return EntryCard(
-            entry: entry,
+            entry: hit.entry,
+            titleHighlight: hit.titleRanges,
+            textHighlight: hit.textRanges,
             onTap: () =>
-                Navigator.of(context).push(ReaderScreen.route(entry: entry)),
+                Navigator.of(context)
+                    .push(ReaderScreen.route(entry: hit.entry)),
           );
         },
       );
@@ -113,7 +109,7 @@ class _SearchScreenState extends State<SearchScreen> {
             focusedBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
-          onChanged: (value) => setState(() => _query = value),
+          onChanged: _onChanged,
         ),
         actions: <Widget>[
           if (_query.isNotEmpty)

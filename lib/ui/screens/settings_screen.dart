@@ -228,79 +228,100 @@ class _ReminderCardState extends State<_ReminderCard> {
     if (mounted) setState(() => _statusMessage = message);
   }
 
-  Future<void> _onToggle(bool enabled) async {
+  Future<void> _onToggle(ReminderSlot slot, bool enabled) async {
     final reminder = widget.reminder;
     final service = widget.notificationService;
 
     if (enabled) {
       final permissionOk = await service.requestPermission();
       if (!permissionOk) {
-        _showStatus('تم رفض إذن الإشعارات. يمكنك تفعيله من إعدادات النظام.');
+        final systemAllows = await service.areNotificationsEnabled();
+        _showStatus(
+          systemAllows
+              ? 'تم رفض إذن الإشعارات. يمكنك تفعيله من إعدادات النظام.'
+              : 'الإشعارات معطلة لهذا التطبيق. يمكنك تفعيلها من إعدادات النظام.',
+        );
         return;
       }
       final scheduled = await service.scheduleDaily(
-        hour: reminder.hour,
-        minute: reminder.minute,
+        slot: slot,
+        hour: reminder.hourFor(slot),
+        minute: reminder.minuteFor(slot),
       );
       if (!scheduled) {
         _showStatus('تعذّر جدولة التذكير.');
         return;
       }
-      await reminder.setEnabled(true);
+      await reminder.setEnabled(slot, true);
       _showStatus(null);
     } else {
-      await service.cancel();
-      await reminder.setEnabled(false);
+      await service.cancelSlot(slot);
+      await reminder.setEnabled(slot, false);
       _showStatus(null);
     }
   }
 
-  Future<void> _pickTime() async {
+  Future<void> _pickTime(ReminderSlot slot) async {
     final reminder = widget.reminder;
     final picked = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay(hour: reminder.hour, minute: reminder.minute),
+      initialTime: TimeOfDay(
+        hour: reminder.hourFor(slot),
+        minute: reminder.minuteFor(slot),
+      ),
     );
     if (picked == null) return;
-    await reminder.setTime(picked.hour, picked.minute);
+    await reminder.setTime(slot, picked.hour, picked.minute);
 
-    // Reschedule if the reminder is currently active.
-    if (reminder.enabled) {
+    // Reschedule if this slot's reminder is currently active.
+    if (reminder.enabledFor(slot)) {
       await widget.notificationService.scheduleDaily(
-        hour: reminder.hour,
-        minute: reminder.minute,
+        slot: slot,
+        hour: reminder.hourFor(slot),
+        minute: reminder.minuteFor(slot),
       );
     }
   }
 
+  Widget _slotTile(ReminderSlot slot) {
+    final ThemeData theme = Theme.of(context);
+    final reminder = widget.reminder;
+    final bool enabled = reminder.enabledFor(slot);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text('تذكير ${slot.label}'),
+          subtitle: Text(slot.body),
+          value: enabled,
+          onChanged: (bool value) => _onToggle(slot, value),
+        ),
+        if (enabled)
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Icons.schedule, color: theme.palette.goldInk),
+            title: Text('وقت تذكير ${slot.label}'),
+            trailing: Text(
+              reminder.timeLabel(slot),
+              style: theme.textTheme.titleMedium,
+            ),
+            onTap: () => _pickTime(slot),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final reminder = widget.reminder;
     final theme = Theme.of(context);
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('تذكير يومي'),
-            subtitle: Text('التذكير: حان وقت أذكار الصباح'),
-            value: reminder.enabled,
-            onChanged: _onToggle,
-          ),
-          if (reminder.enabled) ...<Widget>[
-            const Divider(),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Icon(Icons.schedule, color: theme.palette.goldInk),
-              title: const Text('وقت التذكير'),
-              trailing: Text(
-                reminder.timeLabel,
-                style: theme.textTheme.titleMedium,
-              ),
-              onTap: _pickTime,
-            ),
-          ],
+          _slotTile(ReminderSlot.morning),
+          const Divider(),
+          _slotTile(ReminderSlot.evening),
           if (_statusMessage != null) ...<Widget>[
             const SizedBox(height: AppTheme.space1),
             Text(
@@ -363,36 +384,59 @@ class _FontSizeCardState extends State<_FontSizeCard> {
         horizontal: AppTheme.space4,
         vertical: AppTheme.space2,
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Icon(Icons.format_size, color: theme.palette.goldInk),
-          const SizedBox(width: AppTheme.space3),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text('حجم خط المحتوى', style: theme.textTheme.titleSmall),
-                Text(
-                  'يُستخدم في شاشة القراءة',
-                  style: theme.textTheme.bodySmall,
+          Row(
+            children: <Widget>[
+              Icon(Icons.format_size, color: theme.palette.goldInk),
+              const SizedBox(width: AppTheme.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text('حجم خط المحتوى', style: theme.textTheme.titleSmall),
+                    Text(
+                      'يُستخدم في شاشة القراءة',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ],
                 ),
-              ],
+              ),
+              IconButton(
+                icon: const Icon(Icons.text_decrease),
+                tooltip: 'تصغير الخط',
+                onPressed: _size > ReaderScreen.minFontSize
+                    ? () => _apply(_size - ReaderScreen.fontSizeStep)
+                    : null,
+              ),
+              Text('${_size.round()}', style: theme.textTheme.titleMedium),
+              IconButton(
+                icon: const Icon(Icons.text_increase),
+                tooltip: 'تكبير الخط',
+                onPressed: _size < ReaderScreen.maxFontSize
+                    ? () => _apply(_size + ReaderScreen.fontSizeStep)
+                    : null,
+              ),
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                tooltip: 'إعادة الضبط',
+                onPressed: _size == ReaderScreen.defaultFontSize
+                    ? null
+                    : () => _apply(ReaderScreen.defaultFontSize),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.space2),
+          // Live preview at the chosen size, in the reader's own font.
+          Text.rich(
+            TextSpan(
+              text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',
+              style: AppTheme.religious(
+                fontSize: _size,
+                color: theme.palette.ink,
+              ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.text_decrease),
-            tooltip: 'تصغير الخط',
-            onPressed: _size > ReaderScreen.minFontSize
-                ? () => _apply(_size - ReaderScreen.fontSizeStep)
-                : null,
-          ),
-          Text('${_size.round()}', style: theme.textTheme.titleMedium),
-          IconButton(
-            icon: const Icon(Icons.text_increase),
-            tooltip: 'تكبير الخط',
-            onPressed: _size < ReaderScreen.maxFontSize
-                ? () => _apply(_size + ReaderScreen.fontSizeStep)
-                : null,
           ),
         ],
       ),
