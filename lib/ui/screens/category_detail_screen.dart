@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/content_provider.dart';
+import '../../app/theme/app_theme.dart';
 import '../../content/models/content_category.dart';
 import '../widgets/entry_card.dart';
+import '../widgets/ornaments.dart';
 import '../widgets/state_views.dart';
 import 'reader_screen.dart';
 
@@ -24,14 +26,14 @@ class CategoryDetailScreen extends StatelessWidget {
     final entries = catalog?.entriesByCategory[category.id] ?? const [];
 
     return Scaffold(
-      appBar: AppBar(title: Text(category.title)),
+      appBar: OrnamentedAppBar(title: Text(category.title)),
       body: entries.isEmpty
           ? const EmptyView(
               message: 'لا يوجد محتوى في هذا القسم بعد',
               hint: 'سيظهر المحتوى هنا عند توفره',
             )
           : ListView.builder(
-              padding: const EdgeInsetsDirectional.all(16),
+              padding: const EdgeInsetsDirectional.all(AppTheme.space4),
               itemCount: entries.length,
               itemBuilder: (context, index) {
                 final entry = entries[index];

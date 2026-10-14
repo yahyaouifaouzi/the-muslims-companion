@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../app/theme/app_theme.dart';
+import 'ornaments.dart';
+
 /// Shared non-content states so every screen renders failures and empties
 /// the same calm way.
 class LoadingView extends StatelessWidget {
@@ -19,25 +22,22 @@ class ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsetsDirectional.all(24),
+        padding: const EdgeInsetsDirectional.all(AppTheme.space5),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 40,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            const SizedBox(height: 12),
+          children: <Widget>[
+            MedallionIcon(icon: Icons.error_outline, size: 72),
+            const SizedBox(height: AppTheme.space4),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge,
+              style: theme.textTheme.titleMedium,
             ),
-            if (onRetry != null) ...[
-              const SizedBox(height: 16),
+            if (onRetry != null) ...<Widget>[
+              const SizedBox(height: AppTheme.space4),
               FilledButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
@@ -52,42 +52,50 @@ class ErrorView extends StatelessWidget {
 }
 
 class EmptyView extends StatelessWidget {
-  const EmptyView({super.key, required this.message, this.hint});
+  const EmptyView({
+    super.key,
+    required this.message,
+    this.hint,
+    this.icon = Icons.inbox_outlined,
+  });
 
   final String message;
 
   /// Optional Arabic supporting line shown under the message.
   final String? hint;
 
+  /// Medallion illustration; callers pass an icon that fits their context.
+  final IconData icon;
+
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsetsDirectional.all(24),
+        padding: const EdgeInsetsDirectional.all(AppTheme.space5),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.inbox_outlined,
-              size: 40,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 12),
+          children: <Widget>[
+            MedallionIcon(icon: icon, size: 88),
+            const SizedBox(height: AppTheme.space4),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge,
+              style: theme.textTheme.titleMedium,
             ),
-            if (hint != null) ...[
-              const SizedBox(height: 4),
+            if (hint != null) ...<Widget>[
+              const SizedBox(height: AppTheme.space1),
               Text(
                 hint!,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+                style: theme.textTheme.bodySmall,
               ),
             ],
+            const SizedBox(height: AppTheme.space3),
+            SizedBox(
+              width: 140,
+              child: OrnamentDivider(starSize: 12, vertical: 0),
+            ),
           ],
         ),
       ),
@@ -102,17 +110,22 @@ class PlaceholderBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
+    final AppColors palette = theme.palette;
     return Container(
       padding: const EdgeInsetsDirectional.symmetric(
-        horizontal: 8,
+        horizontal: AppTheme.space2,
         vertical: 3,
       ),
       decoration: BoxDecoration(
-        color: theme.colorScheme.secondary.withValues(alpha: 0.25),
+        color: palette.gold.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: palette.gold.withValues(alpha: 0.55)),
       ),
-      child: Text('غير موثّق', style: theme.textTheme.labelSmall),
+      child: Text(
+        'غير موثّق',
+        style: theme.textTheme.labelSmall?.copyWith(color: palette.goldInk),
+      ),
     );
   }
 }

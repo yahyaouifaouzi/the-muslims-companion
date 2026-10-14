@@ -10,7 +10,22 @@ Licensed under the SIL Open Font License, Version 1.1.
 Files: assets/fonts/NotoNaskhArabic-Regular.ttf, assets/fonts/NotoNaskhArabic-Bold.ttf
 Full license text: assets/fonts/OFL.txt
 
-2. Islamic content (adhkar, duas, hadiths)
+2. Amiri font
+------------
+Copyright 2010-2022 The Amiri Project Authors (https://github.com/aliftype/amiri).
+Licensed under the SIL Open Font License, Version 1.1.
+Files: assets/fonts/Amiri-Regular.ttf, assets/fonts/Amiri-Bold.ttf
+Full license text: assets/fonts/OFL-Amiri.txt
+
+3. Tajawal font
+--------------
+Copyright 2018 Boutros International. (http://www.boutrosfonts.com)
+Licensed under the SIL Open Font License, Version 1.1.
+Files: assets/fonts/Tajawal-Regular.ttf, assets/fonts/Tajawal-Medium.ttf,
+       assets/fonts/Tajawal-Bold.ttf
+Full license text: assets/fonts/OFL-Tajawal.txt
+
+4. Islamic content (adhkar, duas, hadiths)
 ------------------------------------------
 The religious text bundled under assets/data/ (categories.json, adhkar.json,
 duas.json, hadiths.json) is drawn from classical, public-domain Islamic
@@ -19,12 +34,12 @@ attribution (reference and kind) in the JSON. This content is provided for
 personal remembrance and study; users should verify against primary sources
 for religious rulings.
 
-3. Flutter and Dart
+5. Flutter and Dart
 -------------------
 Copyright (c) Google LLC. Licensed under the BSD 3-Clause License.
 This is the application framework, not redistributed as source here.
 
-4. Other packages
+6. Other packages
 -----------------
 See pubspec.yaml for the list of dependencies. Each is licensed by its
 respective author (typically MIT, Apache-2.0, or BSD).

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/content_provider.dart';
+import '../../app/theme/app_theme.dart';
 import '../../content/models/content_entry.dart';
 import '../widgets/entry_card.dart';
+import '../widgets/ornaments.dart';
 import '../widgets/state_views.dart';
 import 'reader_screen.dart';
 
@@ -44,7 +46,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   String _query = '';
 
   @override
@@ -59,6 +61,8 @@ class _SearchScreenState extends State<SearchScreen> {
     // ponytail: recompute-per-keystroke over allEntries (~25ms @5k entries);
     // memoize normalized haystacks when content grows past ~20k or search lags.
     final entries = searchEntries(catalog?.allEntries ?? const [], _query);
+    final Color barForeground =
+        Theme.of(context).appBarTheme.foregroundColor ?? Colors.white;
 
     final Widget body;
     if (catalog == null) {
@@ -67,15 +71,17 @@ class _SearchScreenState extends State<SearchScreen> {
       body = const EmptyView(
         message: 'ابحث في كل المحتوى',
         hint: 'اكتب كلمة من العنوان أو النص أو الوسوم',
+        icon: Icons.search,
       );
     } else if (entries.isEmpty) {
       body = const EmptyView(
         message: 'لا توجد نتائج',
         hint: 'جرّب كلمات أخرى أو تحقق من الإملاء',
+        icon: Icons.search_off,
       );
     } else {
       body = ListView.builder(
-        padding: const EdgeInsetsDirectional.all(16),
+        padding: const EdgeInsetsDirectional.all(AppTheme.space4),
         itemCount: entries.length,
         itemBuilder: (context, index) {
           final entry = entries[index];
@@ -89,18 +95,27 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: OrnamentedAppBar(
         title: TextField(
           controller: _controller,
           autofocus: true,
           textInputAction: TextInputAction.search,
-          decoration: const InputDecoration(
+          style: TextStyle(color: barForeground, fontSize: 18),
+          decoration: InputDecoration(
             hintText: 'ابحث في المحتوى',
+            hintStyle: TextStyle(
+              color: barForeground.withValues(alpha: 0.7),
+              fontSize: 18,
+            ),
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
           ),
           onChanged: (value) => setState(() => _query = value),
         ),
-        actions: [
+        actions: <Widget>[
           if (_query.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.clear),

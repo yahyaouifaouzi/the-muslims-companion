@@ -9,9 +9,13 @@ local repository — **no backend, no database, no login, no analytics, no ads.*
 
 - Package name: `the_muslims_companion`; app id `com.ideas2d.themuslimscompanion`.
 - Canonical app name: Arabic **رفيق المسلم**, English **"The Muslim's Companion"**.
-- Theme: green/off-white/beige Material 3 in `lib/app/theme/app_theme.dart`
-  (`greenPrimary #2E6B34`, `beigeAccent #CBB98A`, `offWhite #FBF9F4`),
-  `fontFamily: 'NotoNaskhArabic'` (bundled, OFL).
+- Theme: parchment/emerald/gold Material 3 with light **and dark** themes in
+  `lib/app/theme/app_theme.dart` (design tokens via the `AppColors`
+  ThemeExtension; the chosen `ThemeMode` is persisted by
+  `lib/app/appearance_store.dart`).
+- Fonts (all bundled, OFL — see `NOTICE`): `Tajawal` (UI), `Amiri` (Qur'an
+  and duas), `NotoNaskhArabic` (hadith). Religious text style:
+  `AppTheme.religious()` / `AppTheme.hadith()`.
 
 ## Commands
 
@@ -25,7 +29,7 @@ export PATH="$HOME/flutter/bin:$PATH"   # Flutter 3.47.x lives at ~/flutter
 flutter pub get
 dart format .          # always run before committing Dart changes
 flutter analyze        # must be clean
-flutter test           # 16 test files; keep green
+flutter test           # 18 test files; keep green
 flutter build apk --debug      # Android smoke build
 flutter build appbundle --release
 flutter build linux --release   # desktop

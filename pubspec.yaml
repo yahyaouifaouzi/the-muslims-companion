@@ -82,6 +82,23 @@ flutter:
     - assets/fonts/
 
   fonts:
+    # UI typeface: titles, labels, buttons (OFL, see NOTICE).
+    - family: Tajawal
+      fonts:
+        - asset: assets/fonts/Tajawal-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Tajawal-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Tajawal-Bold.ttf
+          weight: 700
+    # Calligraphic Naskh for Qur'an verses and duas (OFL, see NOTICE).
+    - family: Amiri
+      fonts:
+        - asset: assets/fonts/Amiri-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Amiri-Bold.ttf
+          weight: 700
+    # Naskh for hadith and secondary religious text (OFL, see NOTICE).
     - family: NotoNaskhArabic
       fonts:
         - asset: assets/fonts/NotoNaskhArabic-Regular.ttf
