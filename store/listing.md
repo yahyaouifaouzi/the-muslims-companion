@@ -15,11 +15,12 @@ morning and evening remembrances, and a prayer counter.
 
 Features:
 - Morning and evening adhkar with source attribution
-- Prayer counter (tasbih) with persistent state
-- Favorites and full-text search
-- Optional daily reminder (where supported by the OS)
-- Adjustable reading font size
-- Arabic interface with a calm green/off-white design
+- Repetition counter (tasbih) with daily progress and set targets
+- Favorites, Arabic-aware full-text search, and continue-reading
+- Optional morning/evening reminders (where supported by the OS)
+- Adjustable reading font size with live preview
+- About-the-content screen with sources and a report link
+- Arabic RTL interface with light and dark themes
 
 Rafiq is fully offline. No account, no analytics, no ads. Content is bundled
 and each entry cites its source (Quran or hadith collection).

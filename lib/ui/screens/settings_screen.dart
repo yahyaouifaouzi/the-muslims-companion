@@ -10,6 +10,7 @@ import '../../app/theme/app_theme.dart';
 import '../../content/local_content_repository.dart' show ContentCatalog;
 import '../../content/refresh/content_refresh_service.dart';
 import '../widgets/ornaments.dart';
+import 'about_content_screen.dart';
 import 'reader_screen.dart';
 
 /// Settings: grouped sections with icons — content update, daily reminder,
@@ -36,6 +37,23 @@ class SettingsScreen extends StatelessWidget {
             subtitle: 'آخر نسخة من الأذكار والأدعية المحفوظة على جهازك',
           ),
           _ContentCard(provider: provider, catalog: catalog),
+          const SizedBox(height: AppTheme.space3),
+          AppCard(
+            onTap: () => Navigator.of(context).push(AboutContentScreen.route()),
+            padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: AppTheme.space4,
+              vertical: AppTheme.space2,
+            ),
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(
+                Icons.info_outline,
+                color: Theme.of(context).palette.goldInk,
+              ),
+              title: const Text('عن المحتوى'),
+              subtitle: const Text('المصادر والإبلاغ عن مشكلة'),
+            ),
+          ),
           const SizedBox(height: AppTheme.space5),
           SectionHeader(
             title: 'التنبيهات',

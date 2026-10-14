@@ -11,6 +11,7 @@ Usage:
   python3 tool/content.py build morning|evening|quran|general|hadith|manifest
   python3 tool/content.py validate [--strict]
   python3 tool/content.py diff
+  python3 tool/content.py review
 """
 
 from __future__ import annotations
@@ -620,6 +621,92 @@ def _verbatim_quran(entry: dict) -> bool:
     return entry["text"] == " ".join(ayats)
 
 
+def review() -> int:
+    """Emit a printable RTL HTML package of every bundled entry for human
+    review (diacritics, attribution, verification flags). No network, no
+    extra dependencies — open the file in any browser and print to PDF."""
+    import html as html_mod
+
+    esc = html_mod.escape
+    categories = {c["id"]: c["title"] for c in load(DATA / "categories.json")["categories"]}
+    manifest = load(DATA / "manifest.json")
+    by_cat: dict[str, list[tuple[str, dict]]] = {}
+    for name, e in all_entries():
+        by_cat.setdefault(e["categoryId"], []).append((name, e))
+
+    parts = [
+        "<!DOCTYPE html>",
+        '<html lang="ar" dir="rtl">',
+        "<head>",
+        '<meta charset="utf-8">',
+        "<title>مراجعة محتوى رفيق المسلم</title>",
+        "<style>",
+        "body{font-family:sans-serif;margin:2rem;line-height:1.9}",
+        "h1{font-size:1.6rem} h2{font-size:1.3rem;border-bottom:1px solid #ccc}",
+        ".entry{break-inside:avoid;margin:1.2rem 0;padding:0.8rem;border:1px solid #ddd}",
+        ".title{font-weight:700;font-size:1.1rem}",
+        ".meta{color:#555;font-size:0.85rem}",
+        ".text{margin:0.5rem 0;white-space:pre-wrap}",
+        ".flag{display:inline-block;padding:0 0.4rem;border-radius:4px;"
+        "background:#eef;font-size:0.8rem;margin-inline-start:0.4rem}",
+        ".warn{background:#fee}",
+        "@media print{h2{break-before:page}h2:first-of-type{break-before:auto}}",
+        "</style>",
+        "</head>",
+        "<body>",
+        "<h1>مراجعة محتوى رفيق المسلم</h1>",
+        f"<p>إصدار المحتوى: {manifest.get('contentVersion')} — "
+        f"آخر تحديث: {manifest.get('updatedAt')}</p>",
+        "<p>كل نص أدناه منقول حرفياً من ملفات المصدر؛ راجع التشكيل "
+        "والمراجع وحالة التوثيق قبل النشر.</p>",
+    ]
+    total = verified = placeholders = with_source = 0
+    for cat_id, title in categories.items():
+        entries = by_cat.get(cat_id, [])
+        parts.append(f"<h2>{esc(title)} ({len(entries)})</h2>")
+        for name, e in sorted(entries, key=lambda x: x[1].get("sortOrder", 0)):
+            total += 1
+            if e.get("verified"):
+                verified += 1
+            if e.get("placeholder"):
+                placeholders += 1
+            src = e.get("source")
+            if src:
+                with_source += 1
+            flags = "".join(
+                [
+                    f'<span class="flag{" warn" if not e.get("verified") else ""}">'
+                    f'{"موثّق" if e.get("verified") else "غير موثّق"}</span>',
+                    '<span class="flag">تجريبي</span>' if e.get("placeholder") else "",
+                ]
+            )
+            parts += [
+                '<div class="entry">',
+                f'<div class="title">{esc(e["title"])} {flags}</div>',
+                f'<div class="meta">{esc(name)} · {esc(e["id"])} · '
+                f'تكرار={e.get("repeatCount", "—")}</div>',
+                f'<div class="text">{esc(e["text"])}</div>',
+            ]
+            if src:
+                parts.append(
+                    f'<div class="meta">المصدر: {esc(src["reference"])}'
+                    f' ({esc(src.get("kind", ""))})</div>'
+                )
+            if e.get("tags"):
+                parts.append(f'<div class="meta">وسوم: {esc(", ".join(e["tags"]))}</div>')
+            parts.append("</div>")
+    parts += [
+        f"<h2>الإجمالي</h2><p>{total} مدخلة — {verified} موثّقة، "
+        f"{with_source} بمصدر، {placeholders} تجريبية.</p>",
+        "</body></html>",
+    ]
+    out = ROOT / "build" / "content_review.html"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text("\n".join(parts), encoding="utf-8")
+    print(f"review: wrote {out} ({total} entries)")
+    return 0
+
+
 def diff() -> int:
     texts = source_texts()
     seen_sources = {x["source"] for x in load(SEEN)}
@@ -671,6 +758,8 @@ def main() -> int:
         return validate(strict="--strict" in sys.argv)
     if cmd == "diff":
         return diff()
+    if cmd == "review":
+        return review()
     print(__doc__)
     return 2
 

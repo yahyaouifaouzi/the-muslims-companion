@@ -78,6 +78,9 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('الإعدادات'));
     await tester.pumpAndSettle();
+    // The list builds lazily; nudge it so the reminder switches exist.
+    await tester.drag(find.byType(ListView).first, const Offset(0, -300));
+    await tester.pumpAndSettle();
     await tester.ensureVisible(find.byType(Switch).first);
     await tester.pumpAndSettle();
   }
@@ -102,6 +105,8 @@ void main() {
     );
     await tester.pumpAndSettle();
     await tester.tap(find.text('الإعدادات'));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView).first, const Offset(0, -300));
     await tester.pumpAndSettle();
 
     expect(find.byType(Switch), findsNothing);
