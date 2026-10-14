@@ -10,36 +10,32 @@ Licensed under the SIL Open Font License, Version 1.1.
 Files: assets/fonts/NotoNaskhArabic-Regular.ttf, assets/fonts/NotoNaskhArabic-Bold.ttf
 Full license text: assets/fonts/OFL.txt
 
-2. Amiri font
-------------
-Copyright 2010-2022 The Amiri Project Authors (https://github.com/aliftype/amiri).
-Licensed under the SIL Open Font License, Version 1.1.
-Files: assets/fonts/Amiri-Regular.ttf, assets/fonts/Amiri-Bold.ttf
-Full license text: assets/fonts/OFL-Amiri.txt
-
-3. Tajawal font
---------------
-Copyright 2018 Boutros International. (http://www.boutrosfonts.com)
-Licensed under the SIL Open Font License, Version 1.1.
-Files: assets/fonts/Tajawal-Regular.ttf, assets/fonts/Tajawal-Medium.ttf,
-       assets/fonts/Tajawal-Bold.ttf
-Full license text: assets/fonts/OFL-Tajawal.txt
-
-4. Islamic content (adhkar, duas, hadiths)
+2. Islamic content (adhkar, duas, hadiths)
 ------------------------------------------
 The religious text bundled under assets/data/ (categories.json, adhkar.json,
-duas.json, hadiths.json) is drawn from classical, public-domain Islamic
-sources (Quran and hadith collections). Each entry carries its source
-attribution (reference and kind) in the JSON. This content is provided for
-personal remembrance and study; users should verify against primary sources
-for religious rulings.
+duas.json, hadiths.json) is drawn from the following public datasets,
+reproduced verbatim (including tashkeel) with per-entry source attribution
+(reference, kind, authenticity) in the JSON:
 
-5. Flutter and Dart
+- Quran text: Tanzil.net, Uthmani script, obtained through the AlQuran
+  Cloud API (quran-uthmani). Distributed unmodified; see
+  https://tanzil.net/docs/quran_text for Tanzil's distribution terms.
+- Morning/evening adhkar: Seen-Arabic/Morning-And-Evening-Adhkar-DB
+  (https://github.com/Seen-Arabic/Morning-And-Evening-Adhkar-DB).
+- Hisn al-Muslim duas: rn0x/hisn_almuslim_json
+  (https://github.com/rn0x/hisn_almuslim_json).
+- Forty hadith an-Nawawi: CheeseWithSauce/HadithsJSONFormat, Sunnah/forty
+  (https://github.com/CheeseWithSauce/HadithsJSONFormat).
+
+This content is provided for personal remembrance and study; users should
+verify against primary sources for religious rulings.
+
+3. Flutter and Dart
 -------------------
 Copyright (c) Google LLC. Licensed under the BSD 3-Clause License.
 This is the application framework, not redistributed as source here.
 
-6. Other packages
+4. Other packages
 -----------------
 See pubspec.yaml for the list of dependencies. Each is licensed by its
 respective author (typically MIT, Apache-2.0, or BSD).
