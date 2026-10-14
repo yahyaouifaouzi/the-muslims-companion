@@ -108,7 +108,7 @@ class MuslimCompanionApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => (counterStore ?? CounterStore())..load(),
         ),
-        ChangeNotifierProvider(create: (_) => ReminderStore()..load()),
+        ChangeNotifierProvider(create: (_) => ReminderStore()),
         ChangeNotifierProvider(create: (_) => AppearanceStore()..load()),
       ],
       // Read below the providers (the widget's own context sits above them).
