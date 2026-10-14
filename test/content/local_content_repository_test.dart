@@ -324,7 +324,7 @@ void main() {
       final catalog = await repository.loadCatalog();
 
       expect(catalog.categories, isNotEmpty);
-      expect(catalog.allEntries.length, 276);
+      expect(catalog.allEntries.length, 316);
 
       for (final category in catalog.categories) {
         expect(catalog.entriesByCategory, contains(category.id));
