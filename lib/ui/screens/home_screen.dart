@@ -66,6 +66,7 @@ class _HomeBody extends StatelessWidget {
         const SizedBox(height: AppTheme.space3),
         FeaturedSection(
           entries: catalog.allEntries,
+          maxItems: 8,
           onEntryTap: (entry) =>
               Navigator.of(context).push(ReaderScreen.route(entry: entry)),
         ),

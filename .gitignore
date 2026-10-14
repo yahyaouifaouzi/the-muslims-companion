@@ -54,3 +54,6 @@ app.*.map.json
 android/key.properties
 *.jks
 *.keystore
+
+# Content source datasets (downloaded for tool/content.py; regenerable)
+/data-sources/

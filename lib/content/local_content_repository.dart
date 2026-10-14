@@ -24,7 +24,15 @@ typedef JsonDocumentLoader = Future<Object?> Function(String assetPath);
 
 Future<Object?> _defaultLoader(String assetPath) async {
   try {
-    return jsonDecode(await rootBundle.loadString(assetPath));
+    // rootBundle.loadString routes files over 50KB through compute(), whose
+    // isolate never completes under the test binding's fake async — decode
+    // inline instead (costs ~1ms even for the largest bundled file).
+    final data = await rootBundle.load(assetPath);
+    final bytes = data.buffer.asUint8List(
+      data.offsetInBytes,
+      data.lengthInBytes,
+    );
+    return jsonDecode(utf8.decode(bytes));
   } on ContentException {
     rethrow;
   } catch (error) {

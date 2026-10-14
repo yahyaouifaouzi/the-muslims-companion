@@ -26,10 +26,14 @@ class FeaturedSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final AppColors palette = theme.palette;
-    final List<ContentEntry> items = entries
-        .where(_isFeatureable)
-        .take(maxItems)
-        .toList();
+    final Iterable<ContentEntry> featureable = entries.where(_isFeatureable);
+    // Curated entries (tagged مختارة) win; without any (e.g. fixtures or a
+    // fresh snapshot) fall back to the first featureable ones.
+    final Iterable<ContentEntry> curated = featureable.where(
+      (entry) => entry.tags.contains('مختارة'),
+    );
+    final List<ContentEntry> items =
+        (curated.isNotEmpty ? curated : featureable).take(maxItems).toList();
     if (items.isEmpty) return const SizedBox.shrink();
 
     return Column(
