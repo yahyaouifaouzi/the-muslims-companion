@@ -3,8 +3,11 @@ import 'package:provider/provider.dart';
 
 import '../../app/content_provider.dart';
 import '../../app/favorites_store.dart';
+import '../../app/theme/app_theme.dart';
 import '../../content/models/content_entry.dart';
 import '../widgets/entry_card.dart';
+import '../widgets/favorite_button.dart';
+import '../widgets/ornaments.dart';
 import '../widgets/state_views.dart';
 import 'reader_screen.dart';
 
@@ -25,14 +28,15 @@ class FavoritesScreen extends StatelessWidget {
     final entries = [for (final id in favorites.ids) ?entryById[id]];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('المفضلة')),
+      appBar: const OrnamentedAppBar(title: Text('المفضلة')),
       body: entries.isEmpty
           ? const EmptyView(
               message: 'لا توجد مفضلات بعد',
               hint: 'أضف ما يعجبك من المحتوى لإيجاده هنا لاحقاً',
+              icon: Icons.favorite_border,
             )
           : ListView.builder(
-              padding: const EdgeInsetsDirectional.all(16),
+              padding: const EdgeInsetsDirectional.all(AppTheme.space4),
               itemCount: entries.length,
               itemBuilder: (context, index) {
                 final entry = entries[index];
@@ -41,11 +45,9 @@ class FavoritesScreen extends StatelessWidget {
                   onTap: () =>
                       Navigator.of(context)
                           .push(ReaderScreen.route(entry: entry)),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.favorite),
-                    tooltip: 'إزالة من المفضلة',
-                    color: Theme.of(context).colorScheme.primary,
-                    onPressed: () => favorites.toggle(entry.id),
+                  trailing: FavoriteButton(
+                    isFavorite: true,
+                    onToggle: () => favorites.toggle(entry.id),
                   ),
                 );
               },

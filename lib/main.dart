@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
+import 'app/appearance_store.dart';
 import 'app/content_provider.dart';
 import 'app/counter_store.dart';
 import 'app/favorites_store.dart';
@@ -108,31 +109,37 @@ class MuslimCompanionApp extends StatelessWidget {
           create: (_) => (counterStore ?? CounterStore())..load(),
         ),
         ChangeNotifierProvider(create: (_) => ReminderStore()..load()),
+        ChangeNotifierProvider(create: (_) => AppearanceStore()..load()),
       ],
-      child: MaterialApp(
-        title: appTitle,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light(),
-        // Cap the app width so wide desktop windows keep a readable,
-        // phone-like column instead of stretching cards edge-to-edge.
-        builder: (context, child) => ColoredBox(
-          color: AppTheme.offWhite,
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 680),
-              child: child,
+      // Read below the providers (the widget's own context sits above them).
+      child: Builder(
+        builder: (context) => MaterialApp(
+          title: appTitle,
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          themeMode: context.watch<AppearanceStore>().mode,
+          // Cap the app width so wide desktop windows keep a readable,
+          // phone-like column instead of stretching cards edge-to-edge.
+          builder: (context, child) => ColoredBox(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 680),
+                child: child,
+              ),
             ),
           ),
-        ),
-        supportedLocales: const [Locale('ar')],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        locale: const Locale('ar'),
-        home: MainShell(
-          notificationService: notificationService ?? NotificationService(),
+          supportedLocales: const [Locale('ar')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          locale: const Locale('ar'),
+          home: MainShell(
+            notificationService: notificationService ?? NotificationService(),
+          ),
         ),
       ),
     );
