@@ -163,11 +163,16 @@ class _ReaderScreenState extends State<ReaderScreen> {
                 maxWidth: ReaderScreen.maxLineWidth,
               ),
               child: SingleChildScrollView(
-                padding: const EdgeInsetsDirectional.fromSTEB(
+                padding: EdgeInsetsDirectional.fromSTEB(
                   AppTheme.space4,
                   AppTheme.space3,
                   AppTheme.space4,
-                  112,
+                  // Keep the floating action pill from covering the text at
+                  // large system font scales.
+                  112 *
+                      MediaQuery.textScalerOf(context)
+                          .clamp(minScaleFactor: 1, maxScaleFactor: 2)
+                          .scale(1),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,

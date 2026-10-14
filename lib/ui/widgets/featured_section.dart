@@ -40,8 +40,10 @@ class FeaturedSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         const SectionHeader(title: 'مختارات', icon: Icons.auto_awesome),
+        // Fixed-height cards must grow with the system font scale so the
+        // title/body never overflow or clip mid-line.
         SizedBox(
-          height: 150,
+          height: 150 * MediaQuery.textScalerOf(context).scale(1),
           child: ListView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsetsDirectional.only(
