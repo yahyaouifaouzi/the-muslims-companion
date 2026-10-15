@@ -95,7 +95,9 @@ void main() {
     expect(find.textContaining('وقت تذكير'), findsNothing);
   });
 
-  testWidgets('unsupported platform hides the reminder card', (tester) async {
+  testWidgets('unsupported platform hides the whole reminders section', (
+    tester,
+  ) async {
     final fake = FakeNotificationService()..schedulingSupported = false;
     await tester.pumpWidget(
       MuslimCompanionApp(
@@ -110,10 +112,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(Switch), findsNothing);
-    expect(
-      find.text('التذكير اليومي غير مدعوم على هذا النظام.'),
-      findsOneWidget,
-    );
+    expect(find.text('التنبيهات'), findsNothing);
+    expect(find.text('التذكير اليومي غير مدعوم على هذا النظام.'), findsNothing);
   });
 
   testWidgets('denied permission keeps the reminder off with a message', (

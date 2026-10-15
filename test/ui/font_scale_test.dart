@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_muslims_companion/app/content_provider.dart';
 import 'package:the_muslims_companion/app/counter_store.dart';
 import 'package:the_muslims_companion/app/favorites_store.dart';
+import 'package:the_muslims_companion/app/last_read_store.dart';
 import 'package:the_muslims_companion/content/local_content_repository.dart';
 import 'package:the_muslims_companion/content/models/content_entry.dart';
 import 'package:the_muslims_companion/main.dart';
@@ -55,6 +56,7 @@ void main() {
             ),
             ChangeNotifierProvider(create: (_) => FavoritesStore()..load()),
             ChangeNotifierProvider(create: (_) => CounterStore()..load()),
+            ChangeNotifierProvider(create: (_) => LastReadStore()..load()),
           ],
           child: MediaQuery(
             data: MediaQueryData(textScaler: TextScaler.linear(scale)),

@@ -79,7 +79,10 @@ class FeaturedSection extends StatelessWidget {
                             child: Text(
                               entry.text,
                               maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
+                              // Fade instead of ellipsis: the fixed-height card
+                              // can leave a partial third line, which would be
+                              // cut mid-line rather than ellipsised.
+                              overflow: TextOverflow.fade,
                               style: theme.textTheme.bodyMedium,
                             ),
                           ),
