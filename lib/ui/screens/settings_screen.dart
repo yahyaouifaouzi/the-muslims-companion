@@ -55,35 +55,21 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppTheme.space5),
-          SectionHeader(
-            title: 'التنبيهات',
-            icon: Icons.notifications_outlined,
-            subtitle: 'تذكير اختياري بوقت الأذكار — ليس التزاماً دينياً',
-          ),
-          if (notificationService.supportsScheduling)
+          // ponytail: on platforms without local-notification scheduling the
+          // whole section is hidden — a broken-looking toggle is worse than
+          // none. Hook: show the reminders card here when every target
+          // platform supports `supportsScheduling`.
+          if (notificationService.supportsScheduling) ...<Widget>[
+            SectionHeader(
+              title: 'التنبيهات',
+              icon: Icons.notifications_outlined,
+              subtitle: 'تذكير اختياري بوقت الأذكار — ليس التزاماً دينياً',
+            ),
             _ReminderCard(
               reminder: reminder,
               notificationService: notificationService,
-            )
-          else
-            AppCard(
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.notifications_off_outlined,
-                    color: Theme.of(context).palette.muted,
-                  ),
-                  const SizedBox(width: AppTheme.space3),
-                  Expanded(
-                    child: Text(
-                      'التذكير اليومي غير مدعوم على هذا النظام.',
-                      style: Theme.of(context).textTheme.bodyMedium
-                          ?.copyWith(color: Theme.of(context).palette.muted),
-                    ),
-                  ),
-                ],
-              ),
             ),
+          ],
           const SizedBox(height: AppTheme.space5),
           const SectionHeader(title: 'عام', icon: Icons.tune),
           const _FontSizeCard(),
